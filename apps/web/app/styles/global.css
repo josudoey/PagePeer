@@ -1,1 +1,30 @@
 @import 'tailwindcss';
+
+html {
+  /* Enable height: 100% on body to have a reference point */
+  height: 100%;
+}
+
+body {
+  /* iOS Chrome/Safari: -webkit-fill-available correctly excludes browser chrome
+     (tab bar, address bar, home indicator) from the height.
+     Applied directly to body (not via html → h-full cascade) to avoid
+     WKWebView's percentage height computation quirk. */
+  height: 100%; /* fallback */
+  height: -webkit-fill-available;
+}
+
+@theme {
+  --animate-fade-in: fade-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+}

@@ -8,11 +8,11 @@ import P2PShare from '../components/P2PShare'
   <head>
     <meta charset='utf-8' />
     <link rel='icon' type='image/svg+xml' href='/favicon.svg' />
-    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover' />
     <meta name='generator' content={Astro.generator} />
     <meta
       name='description'
-      content='Astro + React + Tailwind CSS 現代化網頁應用程式基本專案範本。包含極致視覺設計與互動式元件展示。'
+      content='PagePeer — 免安裝的瀏覽器端 P2P 檔案與訊息分享工具。透過 WebRTC 技術，掃描 QR Code 即可在桌面與手機之間安全、即時地傳輸文字與檔案，無需伺服器中轉。'
     />
     <title>PagePeer - Astro + React + Tailwind CSS 專案</title>
 
@@ -50,54 +50,23 @@ import P2PShare from '../components/P2PShare'
     </style>
   </head>
   <body
-    class='bg-[#0b0f19] text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden relative'
+    class='bg-slate-50 text-slate-800 flex flex-col overflow-hidden relative'
   >
     <!-- Background Decorative Gradients -->
     <div
-      class='absolute top-[-20%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-cyan-500/10 blur-[120px] pointer-events-none'
+      class='absolute top-[-20%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-cyan-500/5 blur-[120px] pointer-events-none'
     >
     </div>
     <div
-      class='absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-blue-600/10 blur-[150px] pointer-events-none'
+      class='absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-blue-600/5 blur-[150px] pointer-events-none'
     >
     </div>
 
-    <!-- Header / Navigation -->
-    <header
-      class='w-full max-w-7xl mx-auto px-6 py-6 flex justify-between items-center z-10'
-    >
-      <div class='flex items-center gap-2'>
-        <span
-          class='text-2xl font-black font-title tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500'
-        >
-          PagePeer
-        </span>
-        <span
-          class='px-2 py-0.5 text-[10px] font-bold tracking-widest text-cyan-400 bg-cyan-950/50 rounded-full border border-cyan-800/40'
-        >
-          V3
-        </span>
-      </div>
-    </header>
-
     <!-- Main P2P Section -->
     <main
-      class='flex-grow flex flex-col items-center justify-center px-4 py-8 z-10 w-full max-w-7xl mx-auto'
+      class='w-full h-full flex flex-col z-10 overflow-hidden min-h-0'
     >
       <P2PShare client:only="react" />
     </main>
-
-    <!-- Footer -->
-    <footer
-      class='w-full border-t border-slate-900 py-6 mt-12 z-10 bg-[#070a12]/80 backdrop-blur-md'
-    >
-      <div
-        class='max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-500'
-      >
-        <p>
-          © {new Date().getFullYear()} PagePeer. P2P 安全檔案傳輸工具.
-        </p>
-      </div>
-    </footer>
   </body>
 </html>
