@@ -8,7 +8,10 @@ import P2PShare from '../components/P2PShare'
   <head>
     <meta charset='utf-8' />
     <link rel='icon' type='image/svg+xml' href='/favicon.svg' />
-    <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover' />
+    <meta
+      name='viewport'
+      content='width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover'
+    />
     <meta name='generator' content={Astro.generator} />
     <meta
       name='description'
@@ -18,12 +21,14 @@ import P2PShare from '../components/P2PShare'
 
     <!-- Room Redirection Script -->
     <script is:inline>
-      const urlParams = new URLSearchParams(window.location.search);
-      const r = urlParams.get('r');
+      const urlParams = new URLSearchParams(window.location.search)
+      const r = urlParams.get('r')
       if (!r) {
-        const randomId = Math.random().toString(36).substring(2, 8);
-        urlParams.set('r', randomId);
-        window.location.replace(window.location.pathname + '?' + urlParams.toString());
+        const randomId = Math.random().toString(36).substring(2, 8)
+        urlParams.set('r', randomId)
+        window.location.replace(
+          window.location.pathname + '?' + urlParams.toString()
+        )
       }
     </script>
 
