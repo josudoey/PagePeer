@@ -17,8 +17,13 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "astro": "^6.4.4",
+    "peerjs": "^1.5.5",
+    "qrcode": "^1.5.4",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "tailwindcss": "^4.3.0"
+  },
+  "devDependencies": {
+    "@types/qrcode": "^1.5.6"
   }
 }

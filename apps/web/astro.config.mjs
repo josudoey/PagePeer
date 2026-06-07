@@ -9,6 +9,9 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   srcDir: './app',
   integrations: [react()],
+  server: {
+    host: '0.0.0.0'
+  },
 
   vite: {
     plugins: [tailwindcss()]

@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css'
-import Counter from '../components/Counter'
+import P2PShare from '../components/P2PShare'
 ---
 
 <!doctype html>
@@ -15,6 +15,17 @@ import Counter from '../components/Counter'
       content='Astro + React + Tailwind CSS 現代化網頁應用程式基本專案範本。包含極致視覺設計與互動式元件展示。'
     />
     <title>PagePeer - Astro + React + Tailwind CSS 專案</title>
+
+    <!-- Room Redirection Script -->
+    <script is:inline>
+      const urlParams = new URLSearchParams(window.location.search);
+      const r = urlParams.get('r');
+      if (!r) {
+        const randomId = Math.random().toString(36).substring(2, 8);
+        urlParams.set('r', randomId);
+        window.location.replace(window.location.pathname + '?' + urlParams.toString());
+      }
+    </script>
 
     <!-- Google Fonts -->
     <link rel='preconnect' href='https://fonts.googleapis.com' />
@@ -98,117 +109,11 @@ import Counter from '../components/Counter'
       </nav>
     </header>
 
-    <!-- Main Hero Section -->
+    <!-- Main P2P Section -->
     <main
-      class='flex-grow flex flex-col items-center justify-center px-6 py-12 z-10'
+      class='flex-grow flex flex-col items-center justify-center px-4 py-8 z-10 w-full max-w-7xl mx-auto'
     >
-      <div class='max-w-4xl w-full text-center flex flex-col items-center'>
-        <!-- Tagline Badge -->
-        <div
-          class='inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs text-slate-300 mb-8 animate-fade-in'
-        >
-          <span class='flex h-2 w-2 relative'>
-            <span
-              class='animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75'
-            ></span>
-            <span
-              class='relative inline-flex rounded-full h-2 w-2 bg-emerald-500'
-            ></span>
-          </span>
-          基本專案已成功部署與配置
-        </div>
-
-        <!-- Main Heading -->
-        <h1
-          class='text-4xl md:text-6xl lg:text-7xl font-extrabold font-title tracking-tight text-white mb-6 leading-tight'
-        >
-          Astro 遇上 <br class='sm:hidden' />
-          <span
-            class='text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500'
-          >
-            React & Tailwind
-          </span>
-        </h1>
-
-        <!-- Subtitle Description -->
-        <p
-          class='text-base md:text-lg text-slate-400 max-w-2xl mb-12 leading-relaxed'
-        >
-          這是一個極速、現代化且為效能最佳化的基礎專案。結合了 <strong
-            class='text-slate-200'>Astro 6</strong
-          > 的極簡靜態優勢、<strong class='text-slate-200'>React 19</strong> 的強大動態互動元件，以及由
-          <strong class='text-slate-200'>Tailwind v4 (Vite)</strong> 驅動的絕佳樣式。
-        </p>
-
-        <!-- Grid Layout for Features & Interactive Card -->
-        <div
-          class='grid md:grid-cols-2 gap-8 max-w-3xl w-full items-center text-left'
-        >
-          <!-- Left: Feature Bullet Points -->
-          <div class='space-y-6'>
-            <h2
-              class='text-xl font-bold font-title text-white tracking-wide border-b border-slate-800 pb-3'
-            >
-              專案核心技術
-            </h2>
-
-            <ul class='space-y-4'>
-              <li class='flex items-start gap-3'>
-                <span
-                  class='mt-1 flex-shrink-0 w-5 h-5 rounded-md bg-cyan-950 flex items-center justify-center border border-cyan-800 text-cyan-400 text-xs font-bold'
-                  >✓</span
-                >
-                <div>
-                  <h3 class='text-sm font-semibold text-slate-200'>
-                    Astro 孤島架構 (Islands)
-                  </h3>
-                  <p class='text-xs text-slate-400 mt-0.5'>
-                    預設生成零 JavaScript 的靜態 HTML，只在需要交互的元件注入
-                    React 水合。
-                  </p>
-                </div>
-              </li>
-              <li class='flex items-start gap-3'>
-                <span
-                  class='mt-1 flex-shrink-0 w-5 h-5 rounded-md bg-cyan-950 flex items-center justify-center border border-cyan-800 text-cyan-400 text-xs font-bold'
-                  >✓</span
-                >
-                <div>
-                  <h3 class='text-sm font-semibold text-slate-200'>
-                    Tailwind CSS v4 (Vite)
-                  </h3>
-                  <p class='text-xs text-slate-400 mt-0.5'>
-                    極致的編譯速度，並支援最新 CSS 語法，完美無縫整合於 Vite
-                    建置流程。
-                  </p>
-                </div>
-              </li>
-              <li class='flex items-start gap-3'>
-                <span
-                  class='mt-1 flex-shrink-0 w-5 h-5 rounded-md bg-cyan-950 flex items-center justify-center border border-cyan-800 text-cyan-400 text-xs font-bold'
-                  >✓</span
-                >
-                <div>
-                  <h3 class='text-sm font-semibold text-slate-200'>
-                    pnpm Workspaces
-                  </h3>
-                  <p class='text-xs text-slate-400 mt-0.5'>
-                    使用 monorepo 管理專案目錄，利於未來與其他應用程式（如
-                    admin, api）共用模組。
-                  </p>
-                </div>
-              </li>
-            </ul>
-          </div>
-
-          <!-- Right: React Interactive Counter Card -->
-          <div class='w-full flex justify-center'>
-            <div id='interactive-counter-container' class='w-full max-w-sm'>
-              <Counter client:load />
-            </div>
-          </div>
-        </div>
-      </div>
+      <P2PShare client:only="react" />
     </main>
 
     <!-- Footer -->
