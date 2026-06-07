@@ -55,6 +55,17 @@ function P2PShare({ roomId, role }: P2PShareProps) {
   const [inputText, setInputText] = useState('')
   const [transferringFile, setTransferringFile] = useState<TransferringFile | null>(null)
   const [peerList, setPeerList] = useState<string[]>([])
+  const [isMobileViewport, setIsMobileViewport] = useState(false)
+
+  // Track window size for mobile layout optimization
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileViewport(window.innerWidth < 768)
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   // Connections list: Map peerId -> DataConnection
   const connectionsRef = useRef<Map<string, DataConnection>>(new Map())
@@ -524,127 +535,200 @@ function P2PShare({ roomId, role }: P2PShareProps) {
   }
 
   return (
-    <div className='w-full max-w-4xl mx-auto px-4 py-6 flex flex-col md:grid md:grid-cols-12 gap-6 items-stretch min-h-[600px]'>
+    <div className={`w-full max-w-4xl mx-auto px-4 py-6 flex flex-col ${isMobileViewport ? '' : 'md:grid md:grid-cols-12'} gap-6 items-stretch min-h-[600px]`}>
       
       {/* Sidebar: Connection & Status Panel */}
-      <div className='md:col-span-4 flex flex-col gap-6'>
-        
-        {/* Connection status card */}
-        <div className='p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 flex flex-col items-center text-center shadow-lg relative overflow-hidden group'>
-          <div className='absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-cyan-500 to-blue-500'></div>
+      {!isMobileViewport && (
+        <div className='md:col-span-4 flex flex-col gap-6'>
           
-          <h3 className='text-sm font-semibold tracking-wider uppercase text-cyan-400 font-title mb-4'>
-            連線狀態
-          </h3>
+          {/* Connection status card */}
+          <div className='p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 flex flex-col items-center text-center shadow-lg relative overflow-hidden group'>
+            <div className='absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-cyan-500 to-blue-500'></div>
+            
+            <h3 className='text-sm font-semibold tracking-wider uppercase text-cyan-400 font-title mb-4'>
+              連線狀態
+            </h3>
 
-          {/* Glowing Indicator light */}
-          <div className='flex items-center gap-3 mb-6 bg-white/5 px-4 py-2 rounded-full border border-white/5'>
-            <span className='flex h-3 w-3 relative'>
-              {connectionStatus === 'connected' && (
-                <>
-                  <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75'></span>
-                  <span className='relative inline-flex rounded-full h-3 w-3 bg-emerald-500'></span>
-                </>
-              )}
-              {connectionStatus === 'waiting' && (
-                <>
-                  <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75'></span>
-                  <span className='relative inline-flex rounded-full h-3 w-3 bg-cyan-500'></span>
-                </>
-              )}
-              {connectionStatus === 'connecting' && (
-                <>
-                  <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75'></span>
-                  <span className='relative inline-flex rounded-full h-3 w-3 bg-amber-500'></span>
-                </>
-              )}
-              {connectionStatus === 'initializing' && (
-                <span className='relative inline-flex rounded-full h-3 w-3 bg-slate-600 animate-pulse'></span>
-              )}
-              {connectionStatus === 'error' && (
-                <span className='relative inline-flex rounded-full h-3 w-3 bg-rose-500'></span>
-              )}
-            </span>
-            <span className='text-xs font-semibold uppercase tracking-wide text-slate-200'>
-              {connectionStatus === 'initializing' && '正在啟動服務'}
-              {connectionStatus === 'waiting' && '等待掃描配對'}
-              {connectionStatus === 'connecting' && '正在建立 P2P 連線'}
-              {connectionStatus === 'connected' && '已建立加密連線'}
-              {connectionStatus === 'error' && '連線失敗'}
-            </span>
-          </div>
-
-          {/* Info & Code */}
-          <div className='w-full space-y-4 text-xs text-slate-400'>
-            <div>
-              <p className='text-slate-500 uppercase tracking-widest text-[10px] mb-1 font-bold'>房號 (Room ID)</p>
-              <p className='text-lg font-mono font-bold text-white tracking-widest'>{roomId}</p>
+            {/* Glowing Indicator light */}
+            <div className='flex items-center gap-3 mb-6 bg-white/5 px-4 py-2 rounded-full border border-white/5'>
+              <span className='flex h-3 w-3 relative'>
+                {connectionStatus === 'connected' && (
+                  <>
+                    <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75'></span>
+                    <span className='relative inline-flex rounded-full h-3 w-3 bg-emerald-500'></span>
+                  </>
+                )}
+                {connectionStatus === 'waiting' && (
+                  <>
+                    <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75'></span>
+                    <span className='relative inline-flex rounded-full h-3 w-3 bg-cyan-500'></span>
+                  </>
+                )}
+                {connectionStatus === 'connecting' && (
+                  <>
+                    <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75'></span>
+                    <span className='relative inline-flex rounded-full h-3 w-3 bg-amber-500'></span>
+                  </>
+                )}
+                {connectionStatus === 'initializing' && (
+                  <span className='relative inline-flex rounded-full h-3 w-3 bg-slate-600 animate-pulse'></span>
+                )}
+                {connectionStatus === 'error' && (
+                  <span className='relative inline-flex rounded-full h-3 w-3 bg-rose-500'></span>
+                )}
+              </span>
+              <span className='text-xs font-semibold uppercase tracking-wide text-slate-200'>
+                {connectionStatus === 'initializing' && '正在啟動服務'}
+                {connectionStatus === 'waiting' && '等待掃描配對'}
+                {connectionStatus === 'connecting' && '正在建立 P2P 連線'}
+                {connectionStatus === 'connected' && '已建立加密連線'}
+                {connectionStatus === 'error' && '連線失敗'}
+              </span>
             </div>
 
-            {role === 'desktop' && qrCodeUrl && (
-              <div className='flex flex-col items-center gap-3 p-3 bg-slate-950/40 rounded-xl border border-white/5'>
-                <p className='text-slate-400'>用手機掃描下方 QR Code 加入連線：</p>
-                <div className='bg-white/5 p-2 rounded-lg border border-cyan-500/20'>
-                  <img src={qrCodeUrl} alt='Connection QR Code' className='w-40 h-40 max-w-full' />
+            {/* Info & Code */}
+            <div className='w-full space-y-4 text-xs text-slate-400'>
+              <div>
+                <p className='text-slate-500 uppercase tracking-widest text-[10px] mb-1 font-bold'>房號 (Room ID)</p>
+                <p className='text-lg font-mono font-bold text-white tracking-widest'>{roomId}</p>
+              </div>
+
+              {role === 'desktop' && qrCodeUrl && (
+                <div className='flex flex-col items-center gap-3 p-3 bg-slate-950/40 rounded-xl border border-white/5'>
+                  <p className='text-slate-400'>用手機掃描下方 QR Code 加入連線：</p>
+                  <div className='bg-white/5 p-2 rounded-lg border border-cyan-500/20'>
+                    <img src={qrCodeUrl} alt='Connection QR Code' className='w-40 h-40 max-w-full' />
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {role === 'mobile' && connectionStatus !== 'connected' && (
-              <div className='p-4 bg-cyan-950/20 border border-cyan-800/30 rounded-xl text-left'>
-                <p className='text-cyan-300 leading-relaxed'>
-                  正在嘗試連接您的電腦網頁...請確保電腦瀏覽器上的 PagePeer 網頁維持開啟狀態。
-                </p>
-              </div>
-            )}
+              {role === 'mobile' && connectionStatus !== 'connected' && (
+                <div className='p-4 bg-cyan-950/20 border border-cyan-800/30 rounded-xl text-left'>
+                  <p className='text-cyan-300 leading-relaxed'>
+                    正在嘗試連接您的電腦網頁...請確保電腦瀏覽器上的 PagePeer 網頁維持開啟狀態。
+                  </p>
+                </div>
+              )}
 
-            {errorMsg && (
-              <div className='p-3 bg-rose-950/30 border border-rose-800/30 text-rose-300 rounded-xl text-left'>
-                {errorMsg}
-              </div>
-            )}
+              {errorMsg && (
+                <div className='p-3 bg-rose-950/30 border border-rose-800/30 text-rose-300 rounded-xl text-left'>
+                  {errorMsg}
+                </div>
+              )}
+            </div>
           </div>
+
+          {/* Device Info / Stats card */}
+          {connectionStatus === 'connected' && (
+            <div className='p-5 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 text-xs shadow-lg space-y-4'>
+              <h4 className='font-bold uppercase tracking-wider text-slate-400 mb-2'>已連線裝置</h4>
+              <div className='space-y-2'>
+                {peerList.map((peerId) => (
+                  <div key={peerId} className='flex items-center gap-2 p-2.5 rounded-lg bg-slate-900/50 border border-white/5'>
+                    <div className='w-2 h-2 rounded-full bg-emerald-400'></div>
+                    <span className='font-mono font-semibold text-slate-300 truncate w-full'>
+                      {peerId.includes('mobile') ? '📱 行動裝置' : '💻 電腦網頁'} ({peerId.substring(peerId.lastIndexOf('-') + 1)})
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-
-        {/* Device Info / Stats card */}
-        {connectionStatus === 'connected' && (
-          <div className='p-5 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 text-xs shadow-lg space-y-4'>
-            <h4 className='font-bold uppercase tracking-wider text-slate-400 mb-2'>已連線裝置</h4>
-            <div className='space-y-2'>
-              {peerList.map((peerId) => (
-                <div key={peerId} className='flex items-center gap-2 p-2.5 rounded-lg bg-slate-900/50 border border-white/5'>
-                  <div className='w-2 h-2 rounded-full bg-emerald-400'></div>
-                  <span className='font-mono font-semibold text-slate-300 truncate w-full'>
-                    {peerId.includes('mobile') ? '📱 行動裝置' : '💻 電腦網頁'} ({peerId.substring(peerId.lastIndexOf('-') + 1)})
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+      )}
 
       {/* Main Panel: Sharing Interface */}
-      <div className='md:col-span-8 flex flex-col gap-6 justify-between'>
+      <div className={`${isMobileViewport ? 'w-full' : 'md:col-span-8'} flex flex-col gap-6 justify-between`}>
         
         {/* Transfer History & Chat Window */}
         <div className='flex-grow flex flex-col p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-lg min-h-[400px] max-h-[500px] overflow-hidden relative'>
           
-          <h3 className='text-sm font-semibold tracking-wider uppercase text-slate-300 font-title border-b border-white/10 pb-3 mb-4 flex justify-between items-center'>
-            <span>傳輸紀錄與聊天</span>
-            <span className='text-[10px] text-slate-500 font-mono'>P2P Encrypted</span>
+          {isMobileViewport && errorMsg && connectionStatus !== 'connecting' && (
+            <div className='mb-4 p-3 bg-rose-950/30 border border-rose-800/30 text-rose-300 text-xs rounded-xl'>
+              {errorMsg}
+            </div>
+          )}
+
+          <h3 className='text-sm font-semibold tracking-wider uppercase text-slate-300 font-title border-b border-white/10 pb-3 mb-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2'>
+            <div className='flex items-center justify-between w-full sm:w-auto'>
+              <span>傳輸紀錄與聊天</span>
+              {isMobileViewport && (
+                <span className='text-[10px] text-slate-500 font-mono sm:hidden'>P2P Encrypted</span>
+              )}
+            </div>
+
+            {isMobileViewport ? (
+              <div className='flex flex-wrap items-center gap-2 text-xs'>
+                <div className='flex items-center gap-1.5 bg-white/5 px-2.5 py-1 rounded-full border border-white/5'>
+                  <span className='flex h-2 w-2 relative'>
+                    {connectionStatus === 'connected' && (
+                      <>
+                        <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75'></span>
+                        <span className='relative inline-flex rounded-full h-2 w-2 bg-emerald-500'></span>
+                      </>
+                    )}
+                    {connectionStatus === 'waiting' && (
+                      <>
+                        <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75'></span>
+                        <span className='relative inline-flex rounded-full h-2 w-2 bg-cyan-500'></span>
+                      </>
+                    )}
+                    {connectionStatus === 'connecting' && (
+                      <>
+                        <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75'></span>
+                        <span className='relative inline-flex rounded-full h-2 w-2 bg-amber-500'></span>
+                      </>
+                    )}
+                    {connectionStatus === 'initializing' && (
+                      <span className='relative inline-flex rounded-full h-2 w-2 bg-slate-600 animate-pulse'></span>
+                    )}
+                    {connectionStatus === 'error' && (
+                      <span className='relative inline-flex rounded-full h-2 w-2 bg-rose-500'></span>
+                    )}
+                  </span>
+                  <span className='font-mono font-bold text-slate-300'>{roomId}</span>
+                </div>
+                {peerList.length > 0 && (
+                  <span className='text-[10px] text-emerald-400 bg-emerald-950/30 border border-emerald-800/30 px-2 py-0.5 rounded-full'>
+                    已連線: {peerList.map(p => p.includes('mobile') ? '📱' : '💻').join(', ')}
+                  </span>
+                )}
+              </div>
+            ) : (
+              <span className='text-[10px] text-slate-500 font-mono hidden sm:inline'>P2P Encrypted</span>
+            )}
           </h3>
 
           {/* Messages list */}
           <div className='flex-grow overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent'>
             {messages.length === 0 ? (
-              <div className='h-full flex flex-col items-center justify-center text-slate-500 text-center py-12'>
-                <svg className='w-12 h-12 mb-3 opacity-30 text-cyan-400 animate-pulse' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='1.5' d='M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z'></path>
-                </svg>
-                <p className='text-sm'>尚未連線或未傳送任何資料。</p>
-                <p className='text-xs text-slate-600 mt-1'>連線成功後，在此處拖放檔案或發送訊息即可傳輸。</p>
-              </div>
+              connectionStatus === 'waiting' && role === 'desktop' && isMobileViewport ? (
+                <div className='h-full flex flex-col items-center justify-center text-center py-6 px-4'>
+                  <p className='text-xs text-cyan-300 font-semibold mb-3'>用手機掃描下方 QR Code 加入連線：</p>
+                  {qrCodeUrl && (
+                    <div className='bg-white/5 p-3 rounded-lg border border-cyan-500/20 mb-3'>
+                      <img src={qrCodeUrl} alt='Connection QR Code' className='w-36 h-36 mx-auto' />
+                    </div>
+                  )}
+                  <p className='text-xs text-slate-400'>房號 (Room ID): <span className='font-mono font-bold text-white'>{roomId}</span></p>
+                </div>
+              ) : connectionStatus !== 'connected' && role === 'mobile' && isMobileViewport ? (
+                <div className='h-full flex flex-col items-center justify-center text-center py-6 px-4'>
+                  <span className='animate-spin h-8 w-8 border-4 border-cyan-400 border-t-transparent rounded-full mb-4'></span>
+                  <p className='text-sm text-cyan-300 font-semibold mb-2'>正在建立 P2P 連線...</p>
+                  <p className='text-xs text-slate-400 max-w-xs leading-relaxed'>
+                    請確保您的電腦瀏覽器上的 PagePeer 網頁維持開啟狀態。
+                  </p>
+                </div>
+              ) : (
+                <div className='h-full flex flex-col items-center justify-center text-slate-500 text-center py-12'>
+                  <svg className='w-12 h-12 mb-3 opacity-30 text-cyan-400 animate-pulse' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='1.5' d='M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z'></path>
+                  </svg>
+                  <p className='text-sm'>尚未連線或未傳送任何資料。</p>
+                  <p className='text-xs text-slate-600 mt-1'>連線成功後，在此處拖放檔案或發送訊息即可傳輸。</p>
+                </div>
+              )
             ) : (
               messages.map((msg) => {
                 const isMe = msg.sender === 'me'
@@ -699,6 +783,15 @@ function P2PShare({ roomId, role }: P2PShareProps) {
                             <a
                               href={msg.file.url}
                               download={msg.file.name}
+                              onClick={(e) => {
+                                e.preventDefault()
+                                const link = document.createElement('a')
+                                link.href = msg.file!.url
+                                link.download = msg.file!.name
+                                document.body.appendChild(link)
+                                link.click()
+                                document.body.removeChild(link)
+                              }}
                               className='flex-grow flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg bg-cyan-500 text-slate-950 font-semibold text-xs hover:bg-cyan-400 active:scale-[0.98] transition-all'
                             >
                               <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
