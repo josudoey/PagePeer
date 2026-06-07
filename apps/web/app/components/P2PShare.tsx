@@ -1003,15 +1003,19 @@ function P2PShare({ roomId, role }: P2PShareProps) {
                               下載檔案
                             </a>
 
-                            {/* Simple preview if it's an image */}
+                            {/* Inline image preview */}
                             {msg.file.type.startsWith('image/') && (
                               <a
                                 href={msg.file.url}
                                 target='_blank'
                                 rel='noreferrer'
-                                className='px-3.5 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-semibold text-xs active:scale-[0.97] transition-all'
+                                className='block mt-1 rounded-xl overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity active:scale-[0.98]'
                               >
-                                預覽
+                                <img
+                                  src={msg.file.url}
+                                  alt={msg.file.name}
+                                  className='max-h-48 w-auto max-w-full object-contain bg-slate-50'
+                                />
                               </a>
                             )}
                           </div>
