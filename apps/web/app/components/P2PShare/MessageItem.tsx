@@ -18,10 +18,10 @@ export interface Message {
 
 interface MessageItemProps {
   msg: Message
-  isMobileViewport: boolean
+  isSmallScreen: boolean
 }
 
-export default function MessageItem({ msg, isMobileViewport }: MessageItemProps) {
+export default function MessageItem({ msg, isSmallScreen }: MessageItemProps) {
   const isMe = msg.sender === 'me'
   const isSystem = msg.sender === 'system'
 
@@ -62,7 +62,7 @@ export default function MessageItem({ msg, isMobileViewport }: MessageItemProps)
           </div>
           <MessageCopyButton
             text={msg.text}
-            isMobileViewport={isMobileViewport}
+            isSmallScreen={isSmallScreen}
             isMe={isMe}
           />
         </div>

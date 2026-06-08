@@ -3,13 +3,13 @@ import { copyToClipboard } from './utils/p2pUtils'
 
 interface MessageCopyButtonProps {
   text: string
-  isMobileViewport: boolean
+  isSmallScreen: boolean
   isMe: boolean
 }
 
 export default function MessageCopyButton({
   text,
-  isMobileViewport,
+  isSmallScreen,
   isMe
 }: MessageCopyButtonProps) {
   const [copied, setCopied] = useState(false)
@@ -27,7 +27,7 @@ export default function MessageCopyButton({
   return (
     <div
       className={`relative flex items-center transition-all duration-200 ${
-        isMobileViewport
+        isSmallScreen
           ? `w-7 opacity-100 ${spacingClass}`
           : `w-0 opacity-0 scale-75 overflow-hidden group-hover/msg:w-7 group-hover/msg:opacity-100 group-hover/msg:scale-100 group-hover/msg:${spacingClass}`
       }`}

@@ -57,7 +57,10 @@ PagePeer/
 │   └── web/                  # Astro 前端應用
 │       ├── app/
 │       │   ├── components/
-│       │   │   └── P2PShare.tsx   # 核心 P2P 元件（WebRTC + UI）
+│       │   │   └── P2PShare/      # 核心 P2P 模組化元件目錄
+│       │   │       ├── index.tsx  # 模組進入點
+│       │   │       ├── hooks/     # P2P 與檔案傳輸自訂 Hooks
+│       │   │       └── utils/     # 格式化與剪貼簿 Utility
 │       │   ├── pages/
 │       │   │   └── index.astro    # 主頁面
 │       │   └── styles/

@@ -4,19 +4,19 @@ import MessageItem, { type Message } from './MessageItem'
 interface MessageListProps {
   messages: Message[]
   connectionStatus: 'initializing' | 'waiting' | 'connecting' | 'connected' | 'error' | 'disconnected'
-  role: 'desktop' | 'mobile'
+  roomRole: 'host' | 'client'
   qrCodeUrl: string
   roomId: string
-  isMobileViewport: boolean
+  isSmallScreen: boolean
 }
 
 export default function MessageList({
   messages,
   connectionStatus,
-  role,
+  roomRole,
   qrCodeUrl,
   roomId,
-  isMobileViewport
+  isSmallScreen
 }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
 
@@ -31,7 +31,7 @@ export default function MessageList({
   }, [messages])
 
   if (messages.length === 0) {
-    if (connectionStatus === 'waiting' && role === 'desktop') {
+    if (connectionStatus === 'waiting' && roomRole === 'host') {
       return (
         <div className='flex-grow flex flex-col items-center justify-center text-center py-6 px-4'>
           <p className='text-sm text-cyan-700 font-semibold mb-3'>
@@ -58,8 +58,8 @@ export default function MessageList({
 
     if (
       connectionStatus === 'connecting' &&
-      role === 'mobile' &&
-      isMobileViewport
+      roomRole === 'client' &&
+      isSmallScreen
     ) {
       return (
         <div className='flex-grow flex flex-col items-center justify-center text-center py-6 px-4'>
@@ -108,7 +108,7 @@ export default function MessageList({
         <MessageItem
           key={msg.id}
           msg={msg}
-          isMobileViewport={isMobileViewport}
+          isSmallScreen={isSmallScreen}
         />
       ))}
     </div>

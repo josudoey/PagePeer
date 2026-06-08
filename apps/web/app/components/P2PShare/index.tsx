@@ -12,10 +12,10 @@ import type { Message } from './MessageItem'
 
 interface P2PShareInnerProps {
   roomId: string
-  role: 'desktop' | 'mobile'
+  roomRole: 'host' | 'client'
 }
 
-function P2PShareInner({ roomId, role }: P2PShareInnerProps) {
+function P2PShareInner({ roomId, roomRole }: P2PShareInnerProps) {
   const [messages, setMessages] = useState<Message[]>([])
   const [inputText, setInputText] = useState('')
   const [qrCodeUrl, setQrCodeUrl] = useState('')
@@ -23,14 +23,14 @@ function P2PShareInner({ roomId, role }: P2PShareInnerProps) {
   const [shareLinkCopied, setShareLinkCopied] = useState(false)
   const [showQrPopover, setShowQrPopover] = useState(false)
   const [dragOver, setDragOver] = useState(false)
-  const [isMobileViewport, setIsMobileViewport] = useState(false)
+  const [isSmallScreen, setIsSmallScreen] = useState(false)
   
   const qrPopoverRef = useRef<HTMLDivElement | null>(null)
 
   // Track window size for mobile layout optimization
   useEffect(() => {
     const handleResize = () => {
-      setIsMobileViewport(window.innerWidth < 768)
+      setIsSmallScreen(window.innerWidth < 768)
     }
     handleResize()
     window.addEventListener('resize', handleResize)
@@ -53,8 +53,8 @@ function P2PShareInner({ roomId, role }: P2PShareInnerProps) {
 
   // Generate QR Code URL
   useEffect(() => {
-    if (role === 'desktop') {
-      const shareUrl = `${window.location.origin}${window.location.pathname}?r=${roomId}&role=mobile`
+    if (roomRole === 'host') {
+      const shareUrl = `${window.location.origin}${window.location.pathname}?r=${roomId}&role=client`
       setShareLink(shareUrl)
       QRCode.toDataURL(shareUrl, {
         width: 256,
@@ -69,7 +69,7 @@ function P2PShareInner({ roomId, role }: P2PShareInnerProps) {
           console.error('QR Code generation failed:', err)
         })
     }
-  }, [roomId, role])
+  }, [roomId, roomRole])
 
   // Connection hook
   const {
@@ -80,7 +80,7 @@ function P2PShareInner({ roomId, role }: P2PShareInnerProps) {
     sendMessage
   } = useP2PConnection({
     roomId,
-    role,
+    roomRole,
     onIncomingSystemMessage: (text) => {
       setMessages((prev) => [
         ...prev,
@@ -190,7 +190,7 @@ function P2PShareInner({ roomId, role }: P2PShareInnerProps) {
       <P2PHeader
         connectionStatus={connectionStatus}
         roomId={roomId}
-        role={role}
+        roomRole={roomRole}
         qrCodeUrl={qrCodeUrl}
         shareLink={shareLink}
         shareLinkCopied={shareLinkCopied}
@@ -203,7 +203,7 @@ function P2PShareInner({ roomId, role }: P2PShareInnerProps) {
       <div className='flex-grow flex flex-col min-h-0 overflow-hidden md:items-center md:pt-6 md:pb-6 md:px-6'>
         <div className='w-full h-full flex flex-col min-h-0 overflow-hidden md:w-[420px] md:rounded-2xl md:shadow-xl md:border md:border-slate-200/80'>
           <main className='flex-grow w-full h-full flex flex-col overflow-hidden min-h-0 relative z-10'>
-            {role === 'mobile' && connectionStatus !== 'connected' && (
+            {roomRole === 'client' && connectionStatus !== 'connected' && (
               <div className='mb-4 p-4 bg-cyan-50 border border-cyan-200/80 rounded-2xl text-left shadow-lg'>
                 <p className='text-sm text-cyan-700 leading-relaxed font-semibold flex items-center gap-2'>
                   <span className='animate-pulse h-2.5 w-2.5 rounded-full bg-cyan-500 flex-shrink-0'></span>
@@ -230,7 +230,7 @@ function P2PShareInner({ roomId, role }: P2PShareInnerProps) {
                 onDrop={handleDrop}
               />
 
-              {isMobileViewport && errorMsg && connectionStatus !== 'connecting' && (
+              {isSmallScreen && errorMsg && connectionStatus !== 'connecting' && (
                 <div className='mb-4 p-3 bg-rose-50 border border-rose-200/30 text-rose-700 text-xs rounded-xl'>
                   {errorMsg}
                 </div>
@@ -262,10 +262,10 @@ function P2PShareInner({ roomId, role }: P2PShareInnerProps) {
               <MessageList
                 messages={messages}
                 connectionStatus={connectionStatus}
-                role={role}
+                roomRole={roomRole}
                 qrCodeUrl={qrCodeUrl}
                 roomId={roomId}
-                isMobileViewport={isMobileViewport}
+                isSmallScreen={isSmallScreen}
               />
 
               <FileTransferProgress transferringFile={transferringFile} />
@@ -288,13 +288,13 @@ function P2PShareInner({ roomId, role }: P2PShareInnerProps) {
 export default function P2PShare() {
   const [params, setParams] = useState<{
     roomId: string
-    role: 'desktop' | 'mobile'
+    roomRole: 'host' | 'client'
   } | null>(null)
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
     let r = urlParams.get('r')
-    const roleParam = urlParams.get('role') === 'mobile' ? 'mobile' : 'desktop'
+    const roleParam = urlParams.get('role') === 'client' ? 'client' : 'host'
 
     if (!r) {
       r = Math.random().toString(36).substring(2, 8)
@@ -303,13 +303,13 @@ export default function P2PShare() {
         window.location.pathname + '?' + urlParams.toString()
       )
     } else {
-      setParams({ roomId: r, role: roleParam })
+      setParams({ roomId: r, roomRole: roleParam })
     }
   }, [])
 
   if (!params) {
     return (
-      <div className='flex items-center justify-center h-24 text-slate-400'>
+      <div className='flex-grow flex items-center justify-center h-24 text-slate-400'>
         <div className='flex flex-col items-center gap-2'>
           <span className='animate-spin h-6 w-6 border-4 border-cyan-400 border-t-transparent rounded-full'></span>
           <span>正在載入傳輸房...</span>
@@ -318,5 +318,5 @@ export default function P2PShare() {
     )
   }
 
-  return <P2PShareInner roomId={params.roomId} role={params.role} />
+  return <P2PShareInner roomId={params.roomId} roomRole={params.roomRole} />
 }

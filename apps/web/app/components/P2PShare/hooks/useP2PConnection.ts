@@ -11,14 +11,14 @@ export type ConnectionStatus =
 
 interface UseP2PConnectionProps {
   roomId: string
-  role: 'desktop' | 'mobile'
+  roomRole: 'host' | 'client'
   onIncomingSystemMessage: (text: string) => void
   onIncomingData: (conn: DataConnection, data: any) => void
 }
 
 export function useP2PConnection({
   roomId,
-  role,
+  roomRole,
   onIncomingSystemMessage,
   onIncomingData
 }: UseP2PConnectionProps) {
@@ -59,7 +59,7 @@ export function useP2PConnection({
         updateActiveConnection()
         setConnectionStatus('connected')
 
-        const deviceType = conn.peer.includes('mobile') ? '行動裝置' : '電腦網頁'
+        const deviceType = conn.peer.includes('client') ? '訪客端' : '主控端'
         onIncomingSystemMessageRef.current(`裝置已連線 (${deviceType})`)
       })
 
@@ -76,7 +76,7 @@ export function useP2PConnection({
 
         // If no connections left
         if (connectionsRef.current.size === 0) {
-          setConnectionStatus(role === 'desktop' ? 'waiting' : 'disconnected')
+          setConnectionStatus(roomRole === 'host' ? 'waiting' : 'disconnected')
         }
       })
 
@@ -85,14 +85,14 @@ export function useP2PConnection({
         setErrorMsg(`連線錯誤: ${err.message}`)
       })
     },
-    [role, updateActiveConnection]
+    [roomRole, updateActiveConnection]
   )
 
   // Initialize PeerJS client
   useEffect(() => {
     const hostPeerId = `pagepeer-room-${roomId}`
     const myId =
-      role === 'desktop'
+      roomRole === 'host'
         ? hostPeerId
         : `pagepeer-client-${roomId}-${Math.random().toString(36).substring(2, 6)}`
 
@@ -105,9 +105,9 @@ export function useP2PConnection({
 
     newPeer.on('open', (id) => {
       console.log(`PeerJS initialized. My ID: ${id}`)
-      setConnectionStatus(role === 'desktop' ? 'waiting' : 'connecting')
+      setConnectionStatus(roomRole === 'host' ? 'waiting' : 'connecting')
 
-      if (role === 'mobile') {
+      if (roomRole === 'client') {
         // Clients automatically connect to host
         console.log(`Attempting to connect to host: ${hostPeerId}`)
         const conn = newPeer.connect(hostPeerId, {
@@ -138,7 +138,7 @@ export function useP2PConnection({
       connectionsRef.current.clear()
       newPeer.destroy()
     }
-  }, [roomId, role, setupConnectionListeners])
+  }, [roomId, roomRole, setupConnectionListeners])
 
   // Send message to all connected peers
   const sendMessage = useCallback((data: any) => {

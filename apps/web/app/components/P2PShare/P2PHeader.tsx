@@ -4,7 +4,7 @@ import type { ConnectionStatus } from './hooks/useP2PConnection'
 interface P2PHeaderProps {
   connectionStatus: ConnectionStatus
   roomId: string
-  role: 'desktop' | 'mobile'
+  roomRole: 'host' | 'client'
   qrCodeUrl: string
   shareLink: string
   shareLinkCopied: boolean
@@ -17,7 +17,7 @@ interface P2PHeaderProps {
 export default function P2PHeader({
   connectionStatus,
   roomId,
-  role,
+  roomRole,
   qrCodeUrl,
   shareLinkCopied,
   onCopyShareLink,
@@ -130,7 +130,7 @@ export default function P2PHeader({
           </div>
 
           {/* Desktop QR Code Popover trigger */}
-          {role === 'desktop' && qrCodeUrl && (
+          {roomRole === 'host' && qrCodeUrl && (
             <div className='relative' ref={qrPopoverRef}>
               <button
                 type='button'
