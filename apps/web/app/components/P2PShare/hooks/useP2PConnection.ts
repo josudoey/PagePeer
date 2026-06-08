@@ -1,0 +1,163 @@
+import { useState, useEffect, useRef, useCallback } from 'react'
+import Peer, { type DataConnection } from 'peerjs'
+
+export type ConnectionStatus =
+  | 'initializing'
+  | 'waiting'
+  | 'connecting'
+  | 'connected'
+  | 'error'
+  | 'disconnected'
+
+interface UseP2PConnectionProps {
+  roomId: string
+  role: 'desktop' | 'mobile'
+  onIncomingSystemMessage: (text: string) => void
+  onIncomingData: (conn: DataConnection, data: any) => void
+}
+
+export function useP2PConnection({
+  roomId,
+  role,
+  onIncomingSystemMessage,
+  onIncomingData
+}: UseP2PConnectionProps) {
+  const [peer, setPeer] = useState<Peer | null>(null)
+  const [connectionStatus, setConnectionStatus] =
+    useState<ConnectionStatus>('initializing')
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [peerList, setPeerList] = useState<string[]>([])
+  
+  // State to trigger reactivity when active connection changes
+  const [activeConnection, setActiveConnection] = useState<DataConnection | null>(null)
+
+  // Map peerId -> DataConnection
+  const connectionsRef = useRef<Map<string, DataConnection>>(new Map())
+
+  // Keep references to current callback handlers to prevent triggering reconnects
+  const onIncomingSystemMessageRef = useRef(onIncomingSystemMessage)
+  const onIncomingDataRef = useRef(onIncomingData)
+
+  useEffect(() => {
+    onIncomingSystemMessageRef.current = onIncomingSystemMessage
+    onIncomingDataRef.current = onIncomingData
+  })
+
+  const updateActiveConnection = useCallback(() => {
+    const conns = Array.from(connectionsRef.current.values())
+    const active = conns.find((c) => c.open) || conns[0] || null
+    setActiveConnection(active)
+    setPeerList(Array.from(connectionsRef.current.keys()))
+  }, [])
+
+  // Setup connection event listeners
+  const setupConnectionListeners = useCallback(
+    (conn: DataConnection) => {
+      conn.on('open', () => {
+        console.log(`Connected to peer: ${conn.peer}`)
+        connectionsRef.current.set(conn.peer, conn)
+        updateActiveConnection()
+        setConnectionStatus('connected')
+
+        const deviceType = conn.peer.includes('mobile') ? '行動裝置' : '電腦網頁'
+        onIncomingSystemMessageRef.current(`裝置已連線 (${deviceType})`)
+      })
+
+      conn.on('data', (data) => {
+        onIncomingDataRef.current(conn, data)
+      })
+
+      conn.on('close', () => {
+        console.log(`Connection closed with peer: ${conn.peer}`)
+        connectionsRef.current.delete(conn.peer)
+        updateActiveConnection()
+
+        onIncomingSystemMessageRef.current('裝置已斷開連線')
+
+        // If no connections left
+        if (connectionsRef.current.size === 0) {
+          setConnectionStatus(role === 'desktop' ? 'waiting' : 'disconnected')
+        }
+      })
+
+      conn.on('error', (err) => {
+        console.error('Connection error:', err)
+        setErrorMsg(`連線錯誤: ${err.message}`)
+      })
+    },
+    [role, updateActiveConnection]
+  )
+
+  // Initialize PeerJS client
+  useEffect(() => {
+    const hostPeerId = `pagepeer-room-${roomId}`
+    const myId =
+      role === 'desktop'
+        ? hostPeerId
+        : `pagepeer-client-${roomId}-${Math.random().toString(36).substring(2, 6)}`
+
+    // Configure PeerJS to connect to public server
+    const newPeer = new Peer(myId, {
+      debug: 1
+    })
+
+    setPeer(newPeer)
+
+    newPeer.on('open', (id) => {
+      console.log(`PeerJS initialized. My ID: ${id}`)
+      setConnectionStatus(role === 'desktop' ? 'waiting' : 'connecting')
+
+      if (role === 'mobile') {
+        // Clients automatically connect to host
+        console.log(`Attempting to connect to host: ${hostPeerId}`)
+        const conn = newPeer.connect(hostPeerId, {
+          reliable: true
+        })
+        setupConnectionListeners(conn)
+      }
+    })
+
+    newPeer.on('connection', (conn) => {
+      console.log(`Incoming connection from: ${conn.peer}`)
+      setupConnectionListeners(conn)
+    })
+
+    newPeer.on('error', (err) => {
+      console.error('PeerJS global error:', err)
+      setConnectionStatus('error')
+      if (err.type === 'unavailable-id') {
+        setErrorMsg('該房號已有人使用，請重新整理網頁以取得新房號。')
+      } else {
+        setErrorMsg(`通訊伺服器錯誤: ${err.message || err.type}`)
+      }
+    })
+
+    return () => {
+      console.log('Destroying peer connections...')
+      connectionsRef.current.forEach((conn) => conn.close())
+      connectionsRef.current.clear()
+      newPeer.destroy()
+    }
+  }, [roomId, role, setupConnectionListeners])
+
+  // Send message to all connected peers
+  const sendMessage = useCallback((data: any) => {
+    let sent = false
+    connectionsRef.current.forEach((conn) => {
+      if (conn.open) {
+        conn.send(data)
+        sent = true
+      }
+    })
+    return sent
+  }, [])
+
+  return {
+    connectionStatus,
+    errorMsg,
+    peerList,
+    activeConnection,
+    sendMessage,
+    peer
+  }
+}

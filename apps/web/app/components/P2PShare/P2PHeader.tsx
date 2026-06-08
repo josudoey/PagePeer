@@ -1,11 +1,5 @@
 import React from 'react'
-
-type ConnectionStatus =
-  | 'initializing'
-  | 'waiting'
-  | 'connecting'
-  | 'connected'
-  | 'error'
+import type { ConnectionStatus } from './hooks/useP2PConnection'
 
 interface P2PHeaderProps {
   connectionStatus: ConnectionStatus
@@ -69,6 +63,9 @@ export default function P2PHeader({
               {connectionStatus === 'initializing' && (
                 <span className='relative inline-flex rounded-full h-2 w-2 bg-slate-400 animate-pulse'></span>
               )}
+              {connectionStatus === 'disconnected' && (
+                <span className='relative inline-flex rounded-full h-2 w-2 bg-slate-400'></span>
+              )}
               {connectionStatus === 'error' && (
                 <span className='relative inline-flex rounded-full h-2 w-2 bg-rose-500'></span>
               )}
@@ -78,6 +75,7 @@ export default function P2PHeader({
               {connectionStatus === 'waiting' && '待配對'}
               {connectionStatus === 'connecting' && '連線中'}
               {connectionStatus === 'connected' && '已加密'}
+              {connectionStatus === 'disconnected' && '已斷線'}
               {connectionStatus === 'error' && '失敗'}
             </span>
           </div>
