@@ -34,7 +34,7 @@ export default function P2PHeader({
             <span className='text-lg md:text-2xl font-black font-title tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-blue-600'>
               PagePeer
             </span>
-            <span className='px-1.5 py-0.5 text-[9px] md:text-xs font-bold tracking-widest text-cyan-600 bg-cyan-50 rounded-full border border-cyan-200/85 shadow-[0_0_8px_rgba(8,145,178,0.03)]'>
+            <span className='px-1.5 py-0.5 text-[9px] md:text-xs font-bold tracking-widest text-cyan-700 bg-cyan-50 rounded-full border border-cyan-200/85 shadow-[0_0_8px_rgba(8,145,178,0.03)]'>
               V3
             </span>
           </div>
@@ -85,7 +85,7 @@ export default function P2PHeader({
         <div className='flex items-center gap-2 text-xs md:text-sm'>
           {/* Room ID and copy button */}
           <div className='flex items-center gap-1 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 text-slate-600 font-mono shadow-inner'>
-            <span className='text-slate-400 text-[10px] select-none pl-0.5'>
+            <span className='text-slate-500 text-[10px] select-none pl-0.5'>
               房號:
             </span>
             <span className='font-bold text-slate-800 tracking-wider text-[11px] md:text-sm'>
@@ -161,7 +161,7 @@ export default function P2PHeader({
               {showQrPopover && (
                 <div className='absolute right-0 mt-2 p-4 rounded-xl bg-white border border-slate-200 shadow-[0_10px_25px_rgba(0,0,0,0.08)] flex flex-col items-center gap-3 text-center z-50 w-64 animate-fade-in'>
                   <div className='absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-cyan-500 to-blue-500 rounded-t-xl'></div>
-                  <p className='text-[11px] font-semibold text-slate-650 leading-normal'>
+                  <p className='text-[11px] font-semibold text-slate-600 leading-normal'>
                     請使用行動裝置掃描 QR Code
                     <br />
                     加入安全連線傳輸：

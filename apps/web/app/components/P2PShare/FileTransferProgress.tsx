@@ -14,7 +14,7 @@ export default function FileTransferProgress({
   return (
     <div className='absolute bottom-[80px] left-6 right-6 p-4 rounded-xl bg-white border border-cyan-500/30 shadow-2xl flex flex-col gap-2 z-20 animate-fade-in'>
       <div className='flex justify-between items-center text-xs'>
-        <span className='text-cyan-600 font-semibold flex items-center gap-2'>
+        <span className='text-cyan-700 font-semibold flex items-center gap-2'>
           <span className='animate-spin h-3.5 w-3.5 border-2 border-cyan-500 border-t-transparent rounded-full'></span>
           {transferringFile.type === 'send'
             ? '正在發送檔案...'

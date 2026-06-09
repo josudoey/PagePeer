@@ -17,9 +17,9 @@ export default function DropZoneOverlay({
     <div
       onDragLeave={onDragLeave}
       onDrop={onDrop}
-      className='absolute inset-0 bg-white/95 border-2 border-dashed border-cyan-500/50 rounded-2xl flex flex-col items-center justify-center text-cyan-600 z-30 animate-fade-in'
+      className='absolute inset-0 bg-white/95 border-2 border-dashed border-cyan-500/50 rounded-2xl flex flex-col items-center justify-center text-cyan-700 z-30 animate-fade-in'
     >
-      <div className='pointer-events-none w-16 h-16 rounded-full bg-cyan-50 flex items-center justify-center mb-4 border border-cyan-200 text-cyan-600 animate-bounce'>
+      <div className='pointer-events-none w-16 h-16 rounded-full bg-cyan-50 flex items-center justify-center mb-4 border border-cyan-200 text-cyan-700 animate-bounce'>
         <svg
           className='w-8 h-8'
           fill='none'

@@ -252,7 +252,7 @@ function P2PShareInner({ roomId, roomRole }: P2PShareInnerProps) {
                         .join(', ')}
                     </span>
                   ) : (
-                    <span className='text-[10px] md:text-xs text-slate-400 font-mono whitespace-nowrap'>
+                    <span className='text-[10px] md:text-xs text-slate-500 font-mono whitespace-nowrap'>
                       P2P Encrypted
                     </span>
                   )}
@@ -309,7 +309,7 @@ export default function P2PShare() {
 
   if (!params) {
     return (
-      <div className='flex-grow flex items-center justify-center h-24 text-slate-400'>
+      <div className='flex-grow flex items-center justify-center h-24 text-slate-500'>
         <div className='flex flex-col items-center gap-2'>
           <span className='animate-spin h-6 w-6 border-4 border-cyan-400 border-t-transparent rounded-full'></span>
           <span>正在載入傳輸房...</span>

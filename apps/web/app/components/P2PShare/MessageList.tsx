@@ -75,7 +75,7 @@ export default function MessageList({
     }
 
     return (
-      <div className='flex-grow flex flex-col items-center justify-center text-slate-400 text-center py-12'>
+      <div className='flex-grow flex flex-col items-center justify-center text-slate-500 text-center py-12'>
         <svg
           className='w-12 h-12 mb-3 opacity-30 text-cyan-500 animate-pulse'
           fill='none'
@@ -92,7 +92,7 @@ export default function MessageList({
         <p className='text-sm text-slate-500'>
           尚未連線或未傳送任何資料。
         </p>
-        <p className='text-xs text-slate-400 mt-1.5'>
+        <p className='text-xs text-slate-500 mt-1.5'>
           連線成功後，在此處拖放檔案或發送訊息即可傳輸。
         </p>
       </div>
