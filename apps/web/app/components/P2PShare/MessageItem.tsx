@@ -120,8 +120,8 @@ export default function MessageItem({
       className={`flex w-full ${isMe ? 'justify-end' : 'justify-start'} group/msg`}
     >
       <div
-        className={`flex gap-2.5 max-w-[85%] ${
-          isMe ? 'flex-row-reverse text-right' : 'flex-row text-left'
+        className={`flex gap-2.5 max-w-[85%] text-left ${
+          isMe ? 'flex-row-reverse' : 'flex-row'
         }`}
       >
         {/* Avatar */}
@@ -147,17 +147,13 @@ export default function MessageItem({
           {/* Message bubble content */}
           {msg.type === 'text' ? (
             <div
-              className={`flex items-center max-w-full ${
-                isMe ? 'flex-row-reverse' : 'flex-row'
+              className={`px-4 py-2.5 rounded-2xl text-xs leading-relaxed shadow-sm flex flex-col max-w-full ${
+                isMe
+                  ? 'bg-[#b2f896] text-slate-900 rounded-tr-none font-normal'
+                  : 'bg-slate-100 text-slate-800 rounded-tl-none border border-slate-200/60'
               }`}
             >
-              <div
-                className={`px-4 py-2.5 rounded-2xl text-xs leading-relaxed shadow-sm whitespace-pre-wrap ${
-                  isMe
-                    ? 'bg-[#b2f896] text-slate-900 rounded-tr-none font-normal'
-                    : 'bg-slate-100 text-slate-800 rounded-tl-none border border-slate-200/60'
-                }`}
-              >
+              <div className='w-full break-words'>
                 {renderMessageText(msg.text, isMe)}
               </div>
               <MessageCopyButton
@@ -171,7 +167,7 @@ export default function MessageItem({
             <div
               className={`max-w-full px-4 py-2.5 rounded-2xl border flex flex-col gap-3 shadow-md ${
                 isMe
-                  ? 'bg-[#b2f896]/20 border-[#b2f896]/50 text-right rounded-tr-none'
+                  ? 'bg-[#b2f896]/20 border-[#b2f896]/50 text-left rounded-tr-none'
                   : 'bg-gradient-to-b from-slate-50 to-slate-100/50 border-slate-200/60 text-left rounded-tl-none'
               }`}
             >
