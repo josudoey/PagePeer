@@ -87,12 +87,13 @@ function P2PShareInner({ roomId, roomRole }: P2PShareInnerProps) {
     roomId,
     roomRole,
     mySeed,
-    onIncomingSystemMessage: (text) => {
+    onIncomingSystemMessage: (text, peerId) => {
       setMessages((prev) => [
         ...prev,
         {
           id: Math.random().toString(),
           sender: 'system',
+          senderId: peerId,
           text,
           timestamp: new Date(),
           type: 'text'

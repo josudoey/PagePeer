@@ -13,7 +13,7 @@ interface UseP2PConnectionProps {
   roomId: string
   roomRole: 'host' | 'client'
   mySeed: string
-  onIncomingSystemMessage: (text: string) => void
+  onIncomingSystemMessage: (text: string, peerId?: string) => void
   onIncomingData: (conn: DataConnection, data: any) => void
 }
 
@@ -68,7 +68,7 @@ export function useP2PConnection({
         })
 
         const deviceType = conn.peer.includes('client') ? '訪客端' : '主控端'
-        onIncomingSystemMessageRef.current(`裝置已連線 (${deviceType})`)
+        onIncomingSystemMessageRef.current(`裝置已連線 (${deviceType})`, conn.peer)
       })
 
       conn.on('data', (data) => {
@@ -80,7 +80,7 @@ export function useP2PConnection({
         connectionsRef.current.delete(conn.peer)
         updateActiveConnection()
 
-        onIncomingSystemMessageRef.current('裝置已斷開連線')
+        onIncomingSystemMessageRef.current('裝置已斷開連線', conn.peer)
 
         // If no connections left
         if (connectionsRef.current.size === 0) {
@@ -140,8 +140,19 @@ export function useP2PConnection({
       }
     })
 
+    const handleBeforeUnload = () => {
+      console.log('Page unloading, closing peer connections...')
+      connectionsRef.current.forEach((conn) => {
+        if (conn.open) {
+          conn.close()
+        }
+      })
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
     return () => {
       console.log('Destroying peer connections...')
+      window.removeEventListener('beforeunload', handleBeforeUnload)
       connectionsRef.current.forEach((conn) => conn.close())
       connectionsRef.current.clear()
       newPeer.destroy()

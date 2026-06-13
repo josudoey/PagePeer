@@ -62,11 +62,41 @@ export default function MessageItem({
   const isSystem = msg.sender === 'system'
 
   if (isSystem) {
+    const seed = msg.senderId ? (peerIdToSeedMap[msg.senderId] || msg.senderId) : null
+    const isRealSeed = seed ? !seed.startsWith('pagepeer-') : false
+    const avatarInfo = isRealSeed && seed ? getAvatarInfo(seed) : null
+    const displayText = avatarInfo && msg.text.startsWith('裝置') ? msg.text.slice(2) : msg.text
+
+    const timeString = new Date(msg.timestamp).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+
     return (
       <div className='text-center my-3'>
-        <span className='px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-xs text-slate-500 tracking-wide font-medium shadow-sm whitespace-pre-wrap'>
-          {renderMessageText(msg.text, false)}
-        </span>
+        {avatarInfo && seed ? (
+          <span className='inline-flex flex-col items-center gap-1.5 px-4 py-2 rounded-2xl bg-slate-100 border border-slate-200 text-xs text-slate-500 tracking-wide font-medium shadow-sm whitespace-pre-wrap align-middle'>
+            {/* Line 1: Message + Time */}
+            <div className='flex items-center gap-1.5 text-[11px] text-slate-500'>
+              <span>{renderMessageText(displayText, false)}</span>
+              <span className='text-[10px] text-slate-400 font-bold ml-1 border-l border-slate-200 pl-1.5 select-none'>
+                {timeString}
+              </span>
+            </div>
+            {/* Line 2: Avatar + Name */}
+            <div className='flex items-center gap-1.5'>
+              <Avatar seed={seed} size='xs' className='flex-shrink-0' />
+              <span className='font-bold text-slate-700'>{avatarInfo.name}</span>
+            </div>
+          </span>
+        ) : (
+          <span className='inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-xs text-slate-500 tracking-wide font-medium shadow-sm whitespace-pre-wrap align-middle'>
+            <span>{renderMessageText(msg.text, false)}</span>
+            <span className='text-[10px] text-slate-400 font-bold ml-1 border-l border-slate-200 pl-1.5 select-none'>
+              {timeString}
+            </span>
+          </span>
+        )}
       </div>
     )
   }
