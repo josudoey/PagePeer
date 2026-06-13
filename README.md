@@ -1,6 +1,6 @@
 # PagePeer
 
-> 免安裝的瀏覽器端 P2P 檔案與訊息分享工具
+> 點對點檔案與訊息分享工具
 
 透過 WebRTC 技術，掃描 QR Code 即可在桌面與手機之間安全、即時地傳輸文字與檔案，**無需伺服器中轉，無需安裝任何應用程式**。
 
@@ -38,14 +38,14 @@
 
 ## 🛠 技術棧
 
-| 層次 | 技術 |
-|------|------|
-| 框架 | [Astro](https://astro.build/) v6 + [React](https://react.dev/) v19 |
-| 樣式 | [Tailwind CSS](https://tailwindcss.com/) v4 |
-| P2P 通訊 | [PeerJS](https://peerjs.com/)（基於 WebRTC） |
-| QR Code | [qrcode](https://github.com/soldair/node-qrcode) |
-| 套件管理 | [pnpm](https://pnpm.io/) Workspaces（Monorepo） |
-| 部署 | GitHub Actions → GitHub Pages |
+| 層次     | 技術                                                               |
+| -------- | ------------------------------------------------------------------ |
+| 框架     | [Astro](https://astro.build/) v6 + [React](https://react.dev/) v19 |
+| 樣式     | [Tailwind CSS](https://tailwindcss.com/) v4                        |
+| P2P 通訊 | [PeerJS](https://peerjs.com/)（基於 WebRTC）                       |
+| QR Code  | [qrcode](https://github.com/soldair/node-qrcode)                   |
+| 套件管理 | [pnpm](https://pnpm.io/) Workspaces（Monorepo）                    |
+| 部署     | GitHub Actions → GitHub Pages                                      |
 
 ---
 
@@ -112,9 +112,9 @@ pnpm --filter web build
 
 ## ⚙️ 環境變數
 
-| 變數名稱 | 說明 | 預設值 |
-|---------|------|--------|
-| `ASTRO_BASE` | Astro base path，部署至子路徑時需設定 | `/` |
+| 變數名稱     | 說明                                  | 預設值 |
+| ------------ | ------------------------------------- | ------ |
+| `ASTRO_BASE` | Astro base path，部署至子路徑時需設定 | `/`    |
 
 GitHub Pages 部署時，CI 會自動設定 `ASTRO_BASE=/PagePeer`。
 
