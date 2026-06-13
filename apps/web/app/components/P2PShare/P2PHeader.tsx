@@ -33,11 +33,10 @@ export default function P2PHeader({
   peerList,
   hidePairingButton = false
 }: P2PHeaderProps) {
-
-  // Resolve peer seed if connected
-  const peerId = peerList[0]
-  const peerSeed = peerId ? peerIdToSeedMap[peerId] || peerId : ''
-  const peerAvatarInfo = peerId ? getAvatarInfo(peerSeed) : null
+  // Resolve peer info for avatar list
+  const maxVisible = 3
+  const visiblePeers = peerList.slice(0, maxVisible)
+  const remainingPeers = peerList.slice(maxVisible)
 
   return (
     <header className='w-full border-b border-slate-200/80 bg-white/70 backdrop-blur-md flex-shrink-0 z-40'>
@@ -94,12 +93,40 @@ export default function P2PHeader({
             </span>
           </div>
 
-
-
-          {/* Connected Peer identity avatar pill */}
-          {connectionStatus === 'connected' && peerAvatarInfo && (
-            <div className='flex items-center bg-cyan-50/80 p-0.5 rounded-full border border-cyan-200/80 shadow-inner animate-fade-in'>
-              <Avatar seed={peerSeed} size='xs' showTooltip={true} />
+          {/* Connected Peer identity avatars */}
+          {connectionStatus === 'connected' && peerList.length > 0 && (
+            <div className='flex items-center -space-x-1.5 animate-fade-in'>
+              {visiblePeers.map((pId) => {
+                const pSeed = peerIdToSeedMap[pId] || pId
+                return (
+                  <Avatar
+                    key={pId}
+                    seed={pSeed}
+                    size='xs'
+                    showTooltip={true}
+                    className='ring-2 ring-white hover:z-10'
+                  />
+                )
+              })}
+              {remainingPeers.length > 0 && (
+                <div className='relative group/more flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-slate-600 border border-slate-200 font-bold text-[9px] ring-2 ring-white select-none transition-all duration-300 hover:scale-105 hover:z-10 shadow-inner cursor-default'>
+                  +{remainingPeers.length}
+                  {/* Tooltip */}
+                  <div className='absolute top-full mt-1.5 hidden group-hover/more:flex flex-col items-center z-50 pointer-events-none animate-fade-in'>
+                    {/* Arrow */}
+                    <div className='w-1.5 h-1.5 bg-slate-800 rotate-45 -mb-[3.5px] z-10'></div>
+                    <div className='bg-slate-800 text-white text-[10px] px-2 py-0.5 rounded shadow-md font-bold whitespace-nowrap'>
+                      還有{' '}
+                      {remainingPeers
+                        .map(
+                          (pId) =>
+                            getAvatarInfo(peerIdToSeedMap[pId] || pId).name
+                        )
+                        .join(', ')}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
