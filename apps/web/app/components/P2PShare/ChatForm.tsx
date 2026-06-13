@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useEffect } from 'react'
 
 interface ChatFormProps {
   inputText: string
@@ -16,12 +16,33 @@ export default function ChatForm({
   connectionStatus
 }: ChatFormProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const isConnected = connectionStatus === 'connected'
+
+  // Auto-resize height based on content
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`
+    }
+  }, [inputText])
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      if (inputText.trim()) {
+        const fakeEvent = {
+          preventDefault: () => {}
+        } as React.FormEvent
+        onSubmit(fakeEvent)
+      }
+    }
+  }
 
   return (
     <form
       onSubmit={onSubmit}
-      className='flex items-center gap-2 mt-4 pt-4 border-t border-slate-200'
+      className='flex items-end gap-2 mt-4 pt-4 border-t border-slate-200'
     >
       {/* Hidden File Input */}
       <input
@@ -37,7 +58,7 @@ export default function ChatForm({
         onClick={() => fileInputRef.current?.click()}
         disabled={!isConnected}
         title='選擇並發送檔案'
-        className='p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-slate-50 disabled:hover:text-slate-500 active:scale-95 transition-all flex items-center justify-center flex-shrink-0'
+        className='p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-slate-50 disabled:hover:text-slate-500 active:scale-95 transition-all flex items-center justify-center flex-shrink-0 mb-0.5'
       >
         {/* Paperclip icon */}
         <svg
@@ -54,23 +75,25 @@ export default function ChatForm({
           ></path>
         </svg>
       </button>
-      <input
-        type='text'
+      <textarea
+        ref={textareaRef}
+        rows={1}
         value={inputText}
         onChange={(e) => onChangeInputText(e.target.value)}
+        onKeyDown={handleKeyDown}
         placeholder={
           isConnected
             ? '輸入訊息...'
             : '尚未連線，無法傳送訊息'
         }
         disabled={!isConnected}
-        className='flex-grow min-w-0 bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-base text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-cyan-500/50 disabled:opacity-50 transition-all'
+        className='flex-grow min-w-0 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-base text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-cyan-500/50 disabled:opacity-50 transition-all resize-none overflow-y-auto min-h-[46px] max-h-[120px] leading-normal'
       />
       <button
         type='submit'
         disabled={!isConnected || !inputText.trim()}
         title='發送訊息'
-        className='p-3 rounded-xl bg-cyan-500 text-white hover:bg-cyan-600 disabled:opacity-30 disabled:hover:bg-cyan-500 active:scale-95 transition-all shadow-[0_4px_12px_rgba(6,182,212,0.15)] flex items-center justify-center flex-shrink-0'
+        className='p-3 rounded-xl bg-cyan-500 text-white hover:bg-cyan-600 disabled:opacity-30 disabled:hover:bg-cyan-500 active:scale-95 transition-all shadow-[0_4px_12px_rgba(6,182,212,0.15)] flex items-center justify-center flex-shrink-0 mb-0.5'
       >
         {/* Paper Plane icon */}
         <svg

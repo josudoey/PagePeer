@@ -24,7 +24,7 @@ function P2PShareInner({ roomId, roomRole }: P2PShareInnerProps) {
   const [showQrPopover, setShowQrPopover] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const [isSmallScreen, setIsSmallScreen] = useState(false)
-  
+
   const qrPopoverRef = useRef<HTMLDivElement | null>(null)
 
   // Track window size for mobile layout optimization
@@ -111,31 +111,37 @@ function P2PShareInner({ roomId, roomRole }: P2PShareInnerProps) {
   })
 
   // File transfer hook
-  const {
-    transferringFile,
-    handleSendFile,
-    handleFileTransferMessage
-  } = useFileTransfer({
-    activeConnection,
-    onTransferComplete: (direction, fileName, fileSize, fileType, fileUrl) => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: Math.random().toString(),
-          sender: direction === 'send' ? 'me' : 'peer',
-          text: direction === 'send' ? `已成功傳送檔案：${fileName}` : `已成功接收檔案：${fileName}`,
-          timestamp: new Date(),
-          type: 'file',
-          file: {
-            name: fileName,
-            size: fileSize,
-            type: fileType,
-            url: fileUrl
+  const { transferringFile, handleSendFile, handleFileTransferMessage } =
+    useFileTransfer({
+      activeConnection,
+      onTransferComplete: (
+        direction,
+        fileName,
+        fileSize,
+        fileType,
+        fileUrl
+      ) => {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: Math.random().toString(),
+            sender: direction === 'send' ? 'me' : 'peer',
+            text:
+              direction === 'send'
+                ? `已成功傳送檔案：${fileName}`
+                : `已成功接收檔案：${fileName}`,
+            timestamp: new Date(),
+            type: 'file',
+            file: {
+              name: fileName,
+              size: fileSize,
+              type: fileType,
+              url: fileUrl
+            }
           }
-        }
-      ])
-    }
-  })
+        ])
+      }
+    })
 
   const handleCopyShareLink = async () => {
     const success = await copyToClipboard(shareLink)
@@ -230,15 +236,17 @@ function P2PShareInner({ roomId, roomRole }: P2PShareInnerProps) {
                 onDrop={handleDrop}
               />
 
-              {isSmallScreen && errorMsg && connectionStatus !== 'connecting' && (
-                <div className='mb-4 p-3 bg-rose-50 border border-rose-200/30 text-rose-700 text-xs rounded-xl'>
-                  {errorMsg}
-                </div>
-              )}
+              {isSmallScreen &&
+                errorMsg &&
+                connectionStatus !== 'connecting' && (
+                  <div className='mb-4 p-3 bg-rose-50 border border-rose-200/30 text-rose-700 text-xs rounded-xl'>
+                    {errorMsg}
+                  </div>
+                )}
 
               <h3 className='text-xs md:text-sm font-semibold tracking-wider uppercase text-slate-500 font-title border-b border-slate-200 pb-1.5 mb-2.5 md:pb-3 md:mb-4 flex flex-row justify-between items-center gap-2'>
                 <div className='flex items-center justify-between w-full sm:w-auto'>
-                  <span className='text-slate-800 font-bold'>傳輸紀錄與聊天</span>
+                  <span className='text-slate-800 font-bold'>對話訊息</span>
                 </div>
 
                 <div className='flex items-center gap-2 text-xs flex-shrink-0'>
