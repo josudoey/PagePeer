@@ -12,6 +12,7 @@ export type ConnectionStatus =
 interface UseP2PConnectionProps {
   roomId: string
   roomRole: 'host' | 'client'
+  mySeed: string
   onIncomingSystemMessage: (text: string) => void
   onIncomingData: (conn: DataConnection, data: any) => void
 }
@@ -19,6 +20,7 @@ interface UseP2PConnectionProps {
 export function useP2PConnection({
   roomId,
   roomRole,
+  mySeed,
   onIncomingSystemMessage,
   onIncomingData
 }: UseP2PConnectionProps) {
@@ -59,6 +61,12 @@ export function useP2PConnection({
         updateActiveConnection()
         setConnectionStatus('connected')
 
+        // Send identity handshake immediately on connection open
+        conn.send({
+          type: 'identity',
+          avatarSeed: mySeed
+        })
+
         const deviceType = conn.peer.includes('client') ? '訪客端' : '主控端'
         onIncomingSystemMessageRef.current(`裝置已連線 (${deviceType})`)
       })
@@ -85,7 +93,7 @@ export function useP2PConnection({
         setErrorMsg(`連線錯誤: ${err.message}`)
       })
     },
-    [roomRole, updateActiveConnection]
+    [roomRole, updateActiveConnection, mySeed]
   )
 
   // Initialize PeerJS client

@@ -1,5 +1,7 @@
 import React from 'react'
 import type { ConnectionStatus } from './hooks/useP2PConnection'
+import Avatar from './Avatar'
+import { getAvatarInfo } from './utils/avatar'
 
 interface P2PHeaderProps {
   connectionStatus: ConnectionStatus
@@ -12,6 +14,10 @@ interface P2PHeaderProps {
   showQrPopover: boolean
   onToggleQrPopover: (open: boolean) => void
   qrPopoverRef: React.RefObject<HTMLDivElement | null>
+  mySeed: string
+  peerIdToSeedMap: Record<string, string>
+  peerList: string[]
+  hidePairingButton?: boolean
 }
 
 export default function P2PHeader({
@@ -23,13 +29,24 @@ export default function P2PHeader({
   onCopyShareLink,
   showQrPopover,
   onToggleQrPopover,
-  qrPopoverRef
+  qrPopoverRef,
+  mySeed,
+  peerIdToSeedMap,
+  peerList,
+  hidePairingButton = false
 }: P2PHeaderProps) {
+  const myAvatarInfo = getAvatarInfo(mySeed)
+
+  // Resolve peer seed if connected
+  const peerId = peerList[0]
+  const peerSeed = peerId ? peerIdToSeedMap[peerId] || peerId : ''
+  const peerAvatarInfo = peerId ? getAvatarInfo(peerSeed) : null
+
   return (
     <header className='w-full border-b border-slate-200/80 bg-white/70 backdrop-blur-md flex-shrink-0 z-40'>
       <div className='max-w-7xl mx-auto px-4 py-2.5 md:px-6 md:py-4 flex items-center justify-between gap-2 md:gap-4'>
         {/* Logo & Version */}
-        <div className='flex items-center gap-2 md:gap-3.5'>
+        <div className='flex items-center gap-2 md:gap-3.5 flex-wrap'>
           <div className='flex items-center gap-1.5'>
             <span className='text-lg md:text-2xl font-black font-title tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-blue-600'>
               PagePeer
@@ -79,12 +96,27 @@ export default function P2PHeader({
               {connectionStatus === 'error' && '失敗'}
             </span>
           </div>
+
+          {/* User identity avatar pill */}
+          <div className='flex items-center gap-1.5 bg-slate-100 pl-1 pr-2.5 h-8 rounded-lg border border-slate-200 text-slate-600 max-w-[130px] sm:max-w-none'>
+            <Avatar seed={mySeed} size='xs' showTooltip={true} />
+            <span className='text-[11px] font-semibold text-slate-600 truncate max-w-[75px] sm:max-w-none'>
+              {myAvatarInfo.name}
+            </span>
+          </div>
+
+          {/* Connected Peer identity avatar pill */}
+          {connectionStatus === 'connected' && peerAvatarInfo && (
+            <div className='flex items-center bg-cyan-50/80 p-0.5 rounded-full border border-cyan-200/80 shadow-inner animate-fade-in'>
+              <Avatar seed={peerSeed} size='xs' showTooltip={true} />
+            </div>
+          )}
         </div>
 
         {/* Right: Room ID + QR popover */}
         <div className='flex items-center gap-2 text-xs md:text-sm'>
           {/* Room ID and copy button */}
-          <div className='flex items-center gap-1 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 text-slate-600 font-mono shadow-inner'>
+          <div className='flex items-center gap-1 bg-slate-100 px-2.5 h-8 rounded-lg border border-slate-200 text-slate-600 font-mono shadow-inner'>
             <span className='text-slate-500 text-[10px] select-none pl-0.5'>
               房號:
             </span>
@@ -94,7 +126,7 @@ export default function P2PHeader({
             <button
               type='button'
               onClick={onCopyShareLink}
-              title='複製房號連結'
+              title='複製通訊連結'
               className='p-0.5 text-slate-500 hover:text-slate-800 rounded hover:bg-slate-200/60 transition-all active:scale-90 flex items-center justify-center'
             >
               {shareLinkCopied ? (
@@ -130,12 +162,12 @@ export default function P2PHeader({
           </div>
 
           {/* Desktop QR Code Popover trigger */}
-          {roomRole === 'host' && qrCodeUrl && (
+          {!hidePairingButton && roomRole === 'host' && qrCodeUrl && (
             <div className='relative' ref={qrPopoverRef}>
               <button
                 type='button'
                 onClick={() => onToggleQrPopover(!showQrPopover)}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-semibold transition-all active:scale-[0.98] ${
+                className={`flex items-center gap-1.5 px-2.5 h-8 rounded-lg border text-[11px] font-semibold transition-all active:scale-[0.98] ${
                   showQrPopover
                     ? 'bg-cyan-500 text-white border-cyan-400 shadow-[0_2px_8px_rgba(6,182,212,0.2)]'
                     : 'bg-slate-100 border-slate-200 text-slate-600 hover:text-slate-800 hover:bg-slate-200/60'
@@ -214,7 +246,7 @@ export default function P2PHeader({
                             d='M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3'
                           />
                         </svg>
-                        <span>複製房號連結</span>
+                        <span>複製通訊連結</span>
                       </>
                     )}
                   </button>

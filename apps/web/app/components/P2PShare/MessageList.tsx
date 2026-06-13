@@ -8,6 +8,8 @@ interface MessageListProps {
   qrCodeUrl: string
   roomId: string
   isSmallScreen: boolean
+  mySeed: string
+  peerIdToSeedMap: Record<string, string>
 }
 
 export default function MessageList({
@@ -16,7 +18,9 @@ export default function MessageList({
   roomRole,
   qrCodeUrl,
   roomId,
-  isSmallScreen
+  isSmallScreen,
+  mySeed,
+  peerIdToSeedMap
 }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
 
@@ -109,6 +113,8 @@ export default function MessageList({
           key={msg.id}
           msg={msg}
           isSmallScreen={isSmallScreen}
+          mySeed={mySeed}
+          peerIdToSeedMap={peerIdToSeedMap}
         />
       ))}
     </div>

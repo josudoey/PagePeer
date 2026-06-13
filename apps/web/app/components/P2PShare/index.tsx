@@ -9,6 +9,7 @@ import { useP2PConnection } from './hooks/useP2PConnection'
 import { useFileTransfer } from './hooks/useFileTransfer'
 import { copyToClipboard } from './utils/p2pUtils'
 import type { Message } from './MessageItem'
+import { getAvatarSeed } from './utils/avatar'
 
 interface P2PShareInnerProps {
   roomId: string
@@ -24,6 +25,9 @@ function P2PShareInner({ roomId, roomRole }: P2PShareInnerProps) {
   const [showQrPopover, setShowQrPopover] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const [isSmallScreen, setIsSmallScreen] = useState(false)
+
+  const [mySeed] = useState(() => getAvatarSeed())
+  const [peerIdToSeedMap, setPeerIdToSeedMap] = useState<Record<string, string>>({})
 
   const qrPopoverRef = useRef<HTMLDivElement | null>(null)
 
@@ -77,10 +81,12 @@ function P2PShareInner({ roomId, roomRole }: P2PShareInnerProps) {
     errorMsg,
     peerList,
     activeConnection,
-    sendMessage
+    sendMessage,
+    peer
   } = useP2PConnection({
     roomId,
     roomRole,
+    mySeed,
     onIncomingSystemMessage: (text) => {
       setMessages((prev) => [
         ...prev,
@@ -95,17 +101,25 @@ function P2PShareInner({ roomId, roomRole }: P2PShareInnerProps) {
     },
     onIncomingData: (conn, data) => {
       const handled = handleFileTransferMessage(conn, data)
-      if (!handled && data && data.type === 'text') {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: Math.random().toString(),
-            sender: 'peer',
-            text: data.text,
-            timestamp: new Date(),
-            type: 'text'
-          }
-        ])
+      if (!handled && data) {
+        if (data.type === 'identity') {
+          setPeerIdToSeedMap((prev) => ({
+            ...prev,
+            [conn.peer]: data.avatarSeed
+          }))
+        } else if (data.type === 'text') {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: Math.random().toString(),
+              sender: 'peer',
+              senderId: conn.peer,
+              text: data.text,
+              timestamp: new Date(),
+              type: 'text'
+            }
+          ])
+        }
       }
     }
   })
@@ -126,6 +140,7 @@ function P2PShareInner({ roomId, roomRole }: P2PShareInnerProps) {
           {
             id: Math.random().toString(),
             sender: direction === 'send' ? 'me' : 'peer',
+            senderId: direction === 'send' ? (peer?.id || 'me') : (activeConnection?.peer || 'peer'),
             text:
               direction === 'send'
                 ? `已成功傳送檔案：${fileName}`
@@ -166,6 +181,7 @@ function P2PShareInner({ roomId, roomRole }: P2PShareInnerProps) {
         {
           id: Math.random().toString(),
           sender: 'me',
+          senderId: peer?.id || 'me',
           text: inputText,
           timestamp: new Date(),
           type: 'text'
@@ -204,6 +220,10 @@ function P2PShareInner({ roomId, roomRole }: P2PShareInnerProps) {
         showQrPopover={showQrPopover}
         onToggleQrPopover={setShowQrPopover}
         qrPopoverRef={qrPopoverRef}
+        mySeed={mySeed}
+        peerIdToSeedMap={peerIdToSeedMap}
+        peerList={peerList}
+        hidePairingButton={messages.length === 0}
       />
 
       <div className='flex-grow flex flex-col min-h-0 overflow-hidden md:items-center md:pt-6 md:pb-6 md:px-6'>
@@ -250,20 +270,9 @@ function P2PShareInner({ roomId, roomRole }: P2PShareInnerProps) {
                 </div>
 
                 <div className='flex items-center gap-2 text-xs flex-shrink-0'>
-                  {peerList.length > 0 ? (
-                    <span className='text-[10px] md:text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 md:px-3 md:py-1 rounded-full font-semibold shadow-sm whitespace-nowrap'>
-                      已連線裝置:{' '}
-                      {peerList
-                        .map((p) =>
-                          p.includes('mobile') ? '📱 行動裝置' : '💻 電腦網頁'
-                        )
-                        .join(', ')}
-                    </span>
-                  ) : (
-                    <span className='text-[10px] md:text-xs text-slate-500 font-mono whitespace-nowrap'>
-                      P2P Encrypted
-                    </span>
-                  )}
+                  <span className='text-[10px] md:text-xs text-slate-500 font-mono whitespace-nowrap'>
+                    P2P Encrypted
+                  </span>
                 </div>
               </h3>
 
@@ -274,6 +283,8 @@ function P2PShareInner({ roomId, roomRole }: P2PShareInnerProps) {
                 qrCodeUrl={qrCodeUrl}
                 roomId={roomId}
                 isSmallScreen={isSmallScreen}
+                mySeed={mySeed}
+                peerIdToSeedMap={peerIdToSeedMap}
               />
 
               <FileTransferProgress transferringFile={transferringFile} />
