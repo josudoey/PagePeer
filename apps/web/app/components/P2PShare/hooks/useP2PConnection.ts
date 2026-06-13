@@ -29,9 +29,10 @@ export function useP2PConnection({
     useState<ConnectionStatus>('initializing')
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [peerList, setPeerList] = useState<string[]>([])
-  
+
   // State to trigger reactivity when active connection changes
-  const [activeConnection, setActiveConnection] = useState<DataConnection | null>(null)
+  const [activeConnection, setActiveConnection] =
+    useState<DataConnection | null>(null)
 
   // Map peerId -> DataConnection
   const connectionsRef = useRef<Map<string, DataConnection>>(new Map())
@@ -68,7 +69,10 @@ export function useP2PConnection({
         })
 
         const deviceType = conn.peer.includes('client') ? '訪客端' : '主控端'
-        onIncomingSystemMessageRef.current(`裝置已連線 (${deviceType})`, conn.peer)
+        onIncomingSystemMessageRef.current(
+          `裝置已連線 (${deviceType})`,
+          conn.peer
+        )
       })
 
       conn.on('data', (data) => {

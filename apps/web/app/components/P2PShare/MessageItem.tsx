@@ -62,10 +62,13 @@ export default function MessageItem({
   const isSystem = msg.sender === 'system'
 
   if (isSystem) {
-    const seed = msg.senderId ? (peerIdToSeedMap[msg.senderId] || msg.senderId) : null
+    const seed = msg.senderId
+      ? peerIdToSeedMap[msg.senderId] || msg.senderId
+      : null
     const isRealSeed = seed ? !seed.startsWith('pagepeer-') : false
     const avatarInfo = isRealSeed && seed ? getAvatarInfo(seed) : null
-    const displayText = avatarInfo && msg.text.startsWith('裝置') ? msg.text.slice(2) : msg.text
+    const displayText =
+      avatarInfo && msg.text.startsWith('裝置') ? msg.text.slice(2) : msg.text
 
     const timeString = new Date(msg.timestamp).toLocaleTimeString([], {
       hour: '2-digit',
@@ -79,20 +82,22 @@ export default function MessageItem({
             {/* Line 1: Message + Time */}
             <div className='flex items-center gap-1.5 text-[11px] text-slate-500'>
               <span>{renderMessageText(displayText, false)}</span>
-              <span className='text-[10px] text-slate-400 font-bold ml-1 border-l border-slate-200 pl-1.5 select-none'>
+              <span className='text-[10px] text-slate-500 font-bold ml-1 border-l border-slate-200 pl-1.5 select-none'>
                 {timeString}
               </span>
             </div>
             {/* Line 2: Avatar + Name */}
             <div className='flex items-center gap-1.5'>
               <Avatar seed={seed} size='xs' className='flex-shrink-0' />
-              <span className='font-bold text-slate-700'>{avatarInfo.name}</span>
+              <span className='font-bold text-slate-500'>
+                {avatarInfo.name}
+              </span>
             </div>
           </span>
         ) : (
           <span className='inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-xs text-slate-500 tracking-wide font-medium shadow-sm whitespace-pre-wrap align-middle'>
             <span>{renderMessageText(msg.text, false)}</span>
-            <span className='text-[10px] text-slate-400 font-bold ml-1 border-l border-slate-200 pl-1.5 select-none'>
+            <span className='text-[10px] text-slate-500 font-bold ml-1 border-l border-slate-200 pl-1.5 select-none'>
               {timeString}
             </span>
           </span>
@@ -105,7 +110,7 @@ export default function MessageItem({
   const seed = isMe
     ? mySeed
     : msg.senderId
-      ? (peerIdToSeedMap[msg.senderId] || msg.senderId)
+      ? peerIdToSeedMap[msg.senderId] || msg.senderId
       : 'peer'
 
   const avatarInfo = getAvatarInfo(seed)
@@ -127,9 +132,11 @@ export default function MessageItem({
         />
 
         {/* Content Area */}
-        <div className={`flex flex-col min-w-0 ${isMe ? 'items-end' : 'items-start'}`}>
+        <div
+          className={`flex flex-col min-w-0 ${isMe ? 'items-end' : 'items-start'}`}
+        >
           {/* Identity Name & Time */}
-          <div className='text-[10px] text-slate-400 font-bold mb-1 px-1.5 whitespace-nowrap select-none'>
+          <div className='text-[10px] text-slate-500 font-bold mb-1 px-1.5 whitespace-nowrap select-none'>
             {isMe ? `${avatarInfo.name} (我)` : avatarInfo.name} •{' '}
             {new Date(msg.timestamp).toLocaleTimeString([], {
               hour: '2-digit',

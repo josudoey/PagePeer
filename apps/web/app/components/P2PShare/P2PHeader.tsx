@@ -14,7 +14,6 @@ interface P2PHeaderProps {
   showQrPopover: boolean
   onToggleQrPopover: (open: boolean) => void
   qrPopoverRef: React.RefObject<HTMLDivElement | null>
-  mySeed: string
   peerIdToSeedMap: Record<string, string>
   peerList: string[]
   hidePairingButton?: boolean
@@ -30,12 +29,10 @@ export default function P2PHeader({
   showQrPopover,
   onToggleQrPopover,
   qrPopoverRef,
-  mySeed,
   peerIdToSeedMap,
   peerList,
   hidePairingButton = false
 }: P2PHeaderProps) {
-  const myAvatarInfo = getAvatarInfo(mySeed)
 
   // Resolve peer seed if connected
   const peerId = peerList[0]
@@ -97,13 +94,7 @@ export default function P2PHeader({
             </span>
           </div>
 
-          {/* User identity avatar pill */}
-          <div className='flex items-center gap-1.5 bg-slate-100 pl-1 pr-2.5 h-8 rounded-lg border border-slate-200 text-slate-600 max-w-[130px] sm:max-w-none'>
-            <Avatar seed={mySeed} size='xs' showTooltip={true} />
-            <span className='text-[11px] font-semibold text-slate-600 truncate max-w-[75px] sm:max-w-none'>
-              {myAvatarInfo.name}
-            </span>
-          </div>
+
 
           {/* Connected Peer identity avatar pill */}
           {connectionStatus === 'connected' && peerAvatarInfo && (
