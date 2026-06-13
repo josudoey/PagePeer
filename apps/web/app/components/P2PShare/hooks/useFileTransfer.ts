@@ -154,7 +154,13 @@ export function useFileTransfer({
           })
 
           const fileUrl = URL.createObjectURL(state.file)
-          onTransferCompleteRef.current('send', state.file.name, state.file.size, state.file.type, fileUrl)
+          onTransferCompleteRef.current(
+            'send',
+            state.file.name,
+            state.file.size,
+            state.file.type,
+            fileUrl
+          )
 
           setTransferringFile(null)
           sendingFileStateRef.current = null
@@ -272,7 +278,8 @@ export function useFileTransfer({
           state.bytesReceived += typedChunk.byteLength
 
           const elapsedSeconds = (Date.now() - state.startTime) / 1000
-          const speed = elapsedSeconds > 0 ? state.bytesReceived / elapsedSeconds : 0
+          const speed =
+            elapsedSeconds > 0 ? state.bytesReceived / elapsedSeconds : 0
           const progress = Math.round(
             (state.chunksReceived / state.totalChunks) * 100
           )
@@ -311,7 +318,13 @@ export function useFileTransfer({
           })
           const url = URL.createObjectURL(blob)
 
-          onTransferCompleteRef.current('receive', state.name, state.size, state.mimeType, url)
+          onTransferCompleteRef.current(
+            'receive',
+            state.name,
+            state.size,
+            state.mimeType,
+            url
+          )
 
           setTransferringFile(null)
           receivingFilesRef.current.delete(fileId)

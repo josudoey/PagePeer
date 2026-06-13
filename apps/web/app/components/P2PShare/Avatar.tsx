@@ -38,7 +38,7 @@ export default function Avatar({
       className={`rounded-full flex items-center justify-center shadow-inner select-none transition-all duration-300 hover:scale-105 relative group/avatar ${sizeClasses} ${className}`}
     >
       <svg
-        viewBox="0 0 24 24"
+        viewBox='0 0 24 24'
         className={`text-white drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.15)] ${iconClasses}`}
       >
         {info.icon}

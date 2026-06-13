@@ -5,7 +5,13 @@ interface ChatFormProps {
   onChangeInputText: (text: string) => void
   onSubmit: (e: React.FormEvent) => void
   onSendFile: (files: FileList | null) => void
-  connectionStatus: 'initializing' | 'waiting' | 'connecting' | 'connected' | 'error' | 'disconnected'
+  connectionStatus:
+    | 'initializing'
+    | 'waiting'
+    | 'connecting'
+    | 'connected'
+    | 'error'
+    | 'disconnected'
 }
 
 export default function ChatForm({
@@ -81,11 +87,7 @@ export default function ChatForm({
         value={inputText}
         onChange={(e) => onChangeInputText(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder={
-          isConnected
-            ? '輸入訊息...'
-            : '尚未連線，無法傳送訊息'
-        }
+        placeholder={isConnected ? '輸入訊息...' : '尚未連線，無法傳送訊息'}
         disabled={!isConnected}
         className='flex-grow min-w-0 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-base text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-cyan-500/50 disabled:opacity-50 transition-all resize-none overflow-y-auto min-h-[46px] max-h-[120px] leading-normal'
       />

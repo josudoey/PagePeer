@@ -29,7 +29,8 @@ function P2PShareInner({ roomId, roomRole }: P2PShareInnerProps) {
   const [isSmallScreen, setIsSmallScreen] = useState(false)
 
   const [mySeed] = useState(() => getAvatarSeed())
-  const myAvatarInfo = getAvatarInfo(mySeed)
+  const myRoomAvatarSeed = `${roomId}_${mySeed}`
+  const myAvatarInfo = getAvatarInfo(myRoomAvatarSeed)
   const [peerIdToSeedMap, setPeerIdToSeedMap] = useState<
     Record<string, string>
   >({})
@@ -91,7 +92,7 @@ function P2PShareInner({ roomId, roomRole }: P2PShareInnerProps) {
   } = useP2PConnection({
     roomId,
     roomRole,
-    mySeed,
+    mySeed: myRoomAvatarSeed,
     onIncomingSystemMessage: (text, peerId) => {
       setMessages((prev) => [
         ...prev,
@@ -323,7 +324,7 @@ function P2PShareInner({ roomId, roomRole }: P2PShareInnerProps) {
                 <div className='flex items-center gap-2 w-full sm:w-auto'>
                   {/* User identity avatar pill */}
                   <div className='flex items-center gap-1.5 bg-slate-100 pl-1 pr-2.5 h-8 rounded-full border border-slate-200 text-slate-600 max-w-[130px] sm:max-w-none select-none'>
-                    <Avatar seed={mySeed} size='xs' />
+                    <Avatar seed={myRoomAvatarSeed} size='xs' />
                     <span className='text-[10px] font-bold text-slate-500 truncate max-w-[75px] sm:max-w-none'>
                       {myAvatarInfo.name}
                     </span>
@@ -357,7 +358,7 @@ function P2PShareInner({ roomId, roomRole }: P2PShareInnerProps) {
                 qrCodeUrl={qrCodeUrl}
                 roomId={roomId}
                 isSmallScreen={isSmallScreen}
-                mySeed={mySeed}
+                mySeed={myRoomAvatarSeed}
                 peerIdToSeedMap={peerIdToSeedMap}
               />
 

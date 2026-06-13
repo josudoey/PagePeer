@@ -122,9 +122,13 @@ export function useP2PConnection({
     const connectToHost = () => {
       if (roomRole !== 'client') return
 
-      const hasActiveConnection = Array.from(connectionsRef.current.values()).some((c) => c.open)
+      const hasActiveConnection = Array.from(
+        connectionsRef.current.values()
+      ).some((c) => c.open)
       if (hasActiveConnection) {
-        console.log('Already have an active open connection, skipping reconnection.')
+        console.log(
+          'Already have an active open connection, skipping reconnection.'
+        )
         return
       }
 
@@ -138,7 +142,9 @@ export function useP2PConnection({
       isConnectingRef.current = true
 
       if (newPeer.disconnected && !newPeer.destroyed) {
-        console.log('Peer is disconnected from signaling server, reconnecting...')
+        console.log(
+          'Peer is disconnected from signaling server, reconnecting...'
+        )
         newPeer.reconnect()
       }
 
@@ -185,9 +191,13 @@ export function useP2PConnection({
     const handleVisibilityOrFocus = () => {
       if (document.visibilityState === 'visible' || document.hasFocus()) {
         if (roomRole === 'client') {
-          const hasActiveConnection = Array.from(connectionsRef.current.values()).some((c) => c.open)
+          const hasActiveConnection = Array.from(
+            connectionsRef.current.values()
+          ).some((c) => c.open)
           if (!hasActiveConnection && !isConnectingRef.current) {
-            console.log('Window focused/visible and client is disconnected. Triggering auto-reconnection.')
+            console.log(
+              'Window focused/visible and client is disconnected. Triggering auto-reconnection.'
+            )
             connectToHost()
           }
         }

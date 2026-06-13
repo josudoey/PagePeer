@@ -3,7 +3,13 @@ import MessageItem, { type Message } from './MessageItem'
 
 interface MessageListProps {
   messages: Message[]
-  connectionStatus: 'initializing' | 'waiting' | 'connecting' | 'connected' | 'error' | 'disconnected'
+  connectionStatus:
+    | 'initializing'
+    | 'waiting'
+    | 'connecting'
+    | 'connected'
+    | 'error'
+    | 'disconnected'
   roomRole: 'host' | 'client'
   qrCodeUrl: string
   roomId: string
@@ -52,9 +58,7 @@ export default function MessageList({
           )}
           <p className='text-sm text-slate-500'>
             房號 (Room ID):{' '}
-            <span className='font-mono font-bold text-slate-800'>
-              {roomId}
-            </span>
+            <span className='font-mono font-bold text-slate-800'>{roomId}</span>
           </p>
         </div>
       )
@@ -93,9 +97,7 @@ export default function MessageList({
             d='M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z'
           ></path>
         </svg>
-        <p className='text-sm text-slate-500'>
-          尚未連線或未傳送任何資料。
-        </p>
+        <p className='text-sm text-slate-500'>尚未連線或未傳送任何資料。</p>
         <p className='text-xs text-slate-500 mt-1.5'>
           連線成功後，在此處拖放檔案或發送訊息即可傳輸。
         </p>
