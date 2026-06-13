@@ -36,6 +36,7 @@ export function useP2PConnection({
 
   // Map peerId -> DataConnection
   const connectionsRef = useRef<Map<string, DataConnection>>(new Map())
+  const isConnectingRef = useRef(false)
 
   // Keep references to current callback handlers to prevent triggering reconnects
   const onIncomingSystemMessageRef = useRef(onIncomingSystemMessage)
@@ -61,6 +62,7 @@ export function useP2PConnection({
         connectionsRef.current.set(conn.peer, conn)
         updateActiveConnection()
         setConnectionStatus('connected')
+        isConnectingRef.current = false
 
         // Send identity handshake immediately on connection open
         conn.send({
@@ -90,11 +92,13 @@ export function useP2PConnection({
         if (connectionsRef.current.size === 0) {
           setConnectionStatus(roomRole === 'host' ? 'waiting' : 'disconnected')
         }
+        isConnectingRef.current = false
       })
 
       conn.on('error', (err) => {
         console.error('Connection error:', err)
         setErrorMsg(`連線錯誤: ${err.message}`)
+        isConnectingRef.current = false
       })
     },
     [roomRole, updateActiveConnection, mySeed]
@@ -115,17 +119,41 @@ export function useP2PConnection({
 
     setPeer(newPeer)
 
+    const connectToHost = () => {
+      if (roomRole !== 'client') return
+
+      const hasActiveConnection = Array.from(connectionsRef.current.values()).some((c) => c.open)
+      if (hasActiveConnection) {
+        console.log('Already have an active open connection, skipping reconnection.')
+        return
+      }
+
+      if (isConnectingRef.current) {
+        console.log('Already attempting to connect, skipping.')
+        return
+      }
+
+      console.log(`Attempting to connect to host: ${hostPeerId}`)
+      setConnectionStatus('connecting')
+      isConnectingRef.current = true
+
+      if (newPeer.disconnected && !newPeer.destroyed) {
+        console.log('Peer is disconnected from signaling server, reconnecting...')
+        newPeer.reconnect()
+      }
+
+      const conn = newPeer.connect(hostPeerId, {
+        reliable: true
+      })
+      setupConnectionListeners(conn)
+    }
+
     newPeer.on('open', (id) => {
       console.log(`PeerJS initialized. My ID: ${id}`)
       setConnectionStatus(roomRole === 'host' ? 'waiting' : 'connecting')
 
       if (roomRole === 'client') {
-        // Clients automatically connect to host
-        console.log(`Attempting to connect to host: ${hostPeerId}`)
-        const conn = newPeer.connect(hostPeerId, {
-          reliable: true
-        })
-        setupConnectionListeners(conn)
+        connectToHost()
       }
     })
 
@@ -137,6 +165,7 @@ export function useP2PConnection({
     newPeer.on('error', (err) => {
       console.error('PeerJS global error:', err)
       setConnectionStatus('error')
+      isConnectingRef.current = false
       if (err.type === 'unavailable-id') {
         setErrorMsg('該房號已有人使用，請重新整理網頁以取得新房號。')
       } else {
@@ -152,11 +181,28 @@ export function useP2PConnection({
         }
       })
     }
+
+    const handleVisibilityOrFocus = () => {
+      if (document.visibilityState === 'visible' || document.hasFocus()) {
+        if (roomRole === 'client') {
+          const hasActiveConnection = Array.from(connectionsRef.current.values()).some((c) => c.open)
+          if (!hasActiveConnection && !isConnectingRef.current) {
+            console.log('Window focused/visible and client is disconnected. Triggering auto-reconnection.')
+            connectToHost()
+          }
+        }
+      }
+    }
+
     window.addEventListener('beforeunload', handleBeforeUnload)
+    window.addEventListener('focus', handleVisibilityOrFocus)
+    document.addEventListener('visibilitychange', handleVisibilityOrFocus)
 
     return () => {
       console.log('Destroying peer connections...')
       window.removeEventListener('beforeunload', handleBeforeUnload)
+      window.removeEventListener('focus', handleVisibilityOrFocus)
+      document.removeEventListener('visibilitychange', handleVisibilityOrFocus)
       connectionsRef.current.forEach((conn) => conn.close())
       connectionsRef.current.clear()
       newPeer.destroy()
