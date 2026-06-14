@@ -55,12 +55,14 @@ export const NOUNS = [
 ]
 
 // Hash a string to a positive number
-export function hashString(str: string): number {
-  let hash = 0
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash)
+export function djb2hash(str: string): number {
+  let hash = 5381
+  for (const char of str) {
+    hash = (hash << 5) + hash + char.charCodeAt(0)
+    hash |= 0
   }
-  return Math.abs(hash)
+
+  return hash >>> 0
 }
 
 // Get or generate a persistent avatar seed for this browser session
@@ -359,11 +361,11 @@ export function getAvatarInfo(seed: string): AvatarInfo {
     }
   }
 
-  const hash = hashString(seed)
+  const hash = djb2hash(seed)
   const colorIndex = hash % MACAROON_COLORS.length
-  const adjIndex = Math.floor(hash / 4) % ADJECTIVES.length
-  const nounIndex = Math.floor(hash / 16) % NOUNS.length
-  const iconIndex = Math.floor(hash / 64) % 12 // 12 animals
+  const nounIndex = djb2hash(seed.repeat(3)) % NOUNS.length
+  const iconIndex = nounIndex
+  const adjIndex = djb2hash(seed.repeat(5)) % ADJECTIVES.length
 
   const name = `${ADJECTIVES[adjIndex]}${NOUNS[nounIndex]}`
   const bgColor = MACAROON_COLORS[colorIndex]

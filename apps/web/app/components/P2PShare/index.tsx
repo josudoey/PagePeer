@@ -88,7 +88,8 @@ function P2PShareInner({ roomId, roomRole }: P2PShareInnerProps) {
     peerList,
     activeConnection,
     sendMessage,
-    peer
+    peer,
+    reconnect
   } = useP2PConnection({
     roomId,
     roomRole,
@@ -211,7 +212,7 @@ function P2PShareInner({ roomId, roomRole }: P2PShareInnerProps) {
     if (errorMsg) {
       toast.error(errorMsg, {
         id: `error-${errorMsg}`,
-        duration: 5000,
+        duration: 2000,
         style: {
           background: '#fff1f2',
           border: '1px solid rgba(254, 205, 211, 0.8)',
@@ -304,6 +305,7 @@ function P2PShareInner({ roomId, roomRole }: P2PShareInnerProps) {
         peerIdToSeedMap={peerIdToSeedMap}
         peerList={peerList}
         hidePairingButton={messages.length === 0}
+        onReconnect={reconnect}
       />
 
       <div className='flex-grow flex flex-col min-h-0 overflow-hidden md:items-center md:pt-6 md:pb-6 md:px-6'>

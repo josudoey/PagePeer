@@ -17,6 +17,7 @@ interface P2PHeaderProps {
   peerIdToSeedMap: Record<string, string>
   peerList: string[]
   hidePairingButton?: boolean
+  onReconnect?: () => void
 }
 
 export default function P2PHeader({
@@ -31,7 +32,8 @@ export default function P2PHeader({
   qrPopoverRef,
   peerIdToSeedMap,
   peerList,
-  hidePairingButton = false
+  hidePairingButton = false,
+  onReconnect
 }: P2PHeaderProps) {
   // Resolve peer info for avatar list
   const maxVisible = 3
@@ -92,6 +94,33 @@ export default function P2PHeader({
               {connectionStatus === 'error' && '失敗'}
             </span>
           </div>
+
+          {/* Reconnect button for visitor client */}
+          {roomRole === 'client' &&
+            (connectionStatus === 'disconnected' ||
+              connectionStatus === 'error') && (
+              <button
+                type='button'
+                onClick={onReconnect}
+                className='flex items-center gap-1.5 px-2.5 h-8 rounded-lg border border-cyan-400 bg-cyan-500 hover:bg-cyan-600 hover:border-cyan-500 active:scale-[0.98] text-[11px] font-semibold text-white transition-all shadow-[0_2px_8px_rgba(6,182,212,0.2)] flex-shrink-0 select-none group animate-fade-in'
+                title='重新與主控端建立連線'
+              >
+                <svg
+                  className='w-3.5 h-3.5 transition-transform duration-500 group-hover:rotate-180'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                  strokeWidth='2'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    d='M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99'
+                  />
+                </svg>
+                <span>重新連線</span>
+              </button>
+            )}
 
           {/* Connected Peer identity avatars */}
           {connectionStatus === 'connected' && peerList.length > 0 && (

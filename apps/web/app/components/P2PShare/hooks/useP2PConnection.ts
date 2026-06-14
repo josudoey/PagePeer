@@ -29,6 +29,7 @@ export function useP2PConnection({
     useState<ConnectionStatus>('initializing')
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [peerList, setPeerList] = useState<string[]>([])
+  const [reconnectTrigger, setReconnectTrigger] = useState(0)
 
   // State to trigger reactivity when active connection changes
   const [activeConnection, setActiveConnection] =
@@ -69,7 +70,6 @@ export function useP2PConnection({
           type: 'identity',
           avatarSeed: mySeed
         })
-
         const deviceType = conn.peer.includes('client') ? '訪客端' : '主控端'
         onIncomingSystemMessageRef.current(
           `裝置已連線 (${deviceType})`,
@@ -217,7 +217,7 @@ export function useP2PConnection({
       connectionsRef.current.clear()
       newPeer.destroy()
     }
-  }, [roomId, roomRole, setupConnectionListeners])
+  }, [roomId, roomRole, setupConnectionListeners, reconnectTrigger])
 
   // Send message to all connected peers
   const sendMessage = useCallback((data: any) => {
@@ -231,12 +231,20 @@ export function useP2PConnection({
     return sent
   }, [])
 
+  const reconnect = useCallback(() => {
+    if (roomRole !== 'client') return
+    setErrorMsg(null)
+    setConnectionStatus('initializing')
+    setReconnectTrigger((prev) => prev + 1)
+  }, [roomRole])
+
   return {
     connectionStatus,
     errorMsg,
     peerList,
     activeConnection,
     sendMessage,
-    peer
+    peer,
+    reconnect
   }
 }
